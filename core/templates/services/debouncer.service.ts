@@ -47,7 +47,7 @@ export class DebouncerService {
       }
     };
 
-    return function () {
+    return function() {
       context = this;
       args = arguments;
       timestamp = new Date().getTime();
