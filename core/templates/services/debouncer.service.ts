@@ -27,27 +27,27 @@ export class DebouncerService {
   // be invoked. The function only gets executed after it stops being called
   // for `wait` milliseconds.
   debounce(func: () => void, millisecsToWait: number): () => void {
-    let timeout;
+    let timeout: ReturnType<typeof setTimeout>;
     let context = this;
-    let args = arguments;
-    let timestamp;
-    let result;
+    let args: any = arguments;
+    let timestamp: number;
+    let result: void;
 
     const later = () => {
       let last = new Date().getTime() - timestamp;
       if (last < millisecsToWait) {
         timeout = setTimeout(later, millisecsToWait - last);
       } else {
-        timeout = null;
+        timeout;
         result = func.apply(context, args);
         if (!timeout) {
-          context = null;
-          args = null;
+          context;
+          args;
         }
       }
     };
 
-    return function() {
+    return function () {
       context = this;
       args = arguments;
       timestamp = new Date().getTime();

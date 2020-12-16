@@ -27,7 +27,8 @@
       "filters/*": ["core/templates/filters/*"],
       "static/*": ["third_party/static/*"],
       "tests/*": ["core/templates/tests/*"]
-    }
+    },
+    "noImplicitThis": false
   },
   "files": [
     "assets/constants.ts",
