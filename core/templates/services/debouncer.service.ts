@@ -29,7 +29,7 @@ export class DebouncerService {
   debounce(func: () => void, millisecsToWait: number): () => void {
     let timeout: ReturnType<typeof setTimeout>;
     let context = this;
-    let args: IArguments|any = arguments;
+    let args = arguments;
     let timestamp: number;
     let result: void;
 
