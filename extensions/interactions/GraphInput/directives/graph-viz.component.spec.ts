@@ -30,6 +30,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UtilsService } from 'services/utils.service';
 import { EdgeCentre, GraphDetailService } from './graph-detail.service';
+import { ElementRef } from '@angular/core';
 
 interface GraphButton {
     text: string;
@@ -52,6 +53,7 @@ describe('GraphVizComponent', () => {
   let utilsService: UtilsService;
   let edgeCentre: EdgeCentre;
   let graphDetailService: GraphDetailService;
+  let element: ElementRef;
   let graph: GraphAnswer;
   let canAddVertex: boolean;
   let canDeleteVertex: boolean;
@@ -100,16 +102,7 @@ describe('GraphVizComponent', () => {
     mouseDragStartX: 0,
     mouseDragStartY: 0
   };
-  let selectedEdgeWeightValue: number | string;
-  let buttons: GraphButton[] = [];
-  let vizContainer: SVGSVGElement[];
   let componentSubscriptions: Subscription = new Subscription();
-  let shouldShowWrongWeightWarning: boolean;
-  let VERTEX_RADIUS: number;
-  let EDGE_WIDTH: number;
-  let vizWidth: SVGAnimatedLength;
-  let graphOptions: GraphOption[];
-  let svgViewBox: string;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -126,6 +119,7 @@ describe('GraphVizComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     focusManagerService = TestBed.inject(FocusManagerService);
     utilsService = TestBed.inject(UtilsService);
+    element = TestBed.inject(ElementRef);
     graphDetailService = TestBed.inject(GraphDetailService);
     interactionsExtensionsConstants = TestBed.inject(
       InteractionsExtensionsConstants);
@@ -137,49 +131,27 @@ describe('GraphVizComponent', () => {
   });
 
   it('should set component properties when ngOnInit() is called', () => {
-    graph = {
-        vertices: [{
-          x: 1.0,
-          y: 1.0,
-          label: 'a'
-        }, {
-          x: 2.0,
-          y: 2.0,
-          label: 'b'
-        }, {
-          x: 3.0,
-          y: 3.0,
-          label: 'c'
-        }],
-        edges: [{
-          src: 0,
-          dst: 1,
-          weight: 1
-        }, {
-          src: 1,
-          dst: 2,
-          weight: 2
-        }],
-        isDirected: false,
-        isWeighted: true,
-        isLabeled: true
-      };
-    canAddVertex = true;
-    canDeleteVertex = true;
-    canMoveVertex = true;
-    canEditVertexLabel = true;
-    canAddEdge = true;
-    canDeleteEdge = true;
-    canEditEdgeWeight = true;
-    interactionIsActive = true;
-    canEditOptions = true;
     component.ngOnInit();
-    expect(component.VERTEX_RADIUS).toBe(
-      component.graphDetailService.VERTEX_RADIUS);
-    expect(component.testimonialCount).toBe(3);
-    expect(component.classroomUrl).toBe('/learn/math');
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.callThrough;
-    expect(windowDimensionsService.isWindowNarrow()).toHaveBeenCalled;
-    expect(component.isWindowNarrow).toBe(true);
+    spyOn(componentSubscriptions, 'add').and.callThrough;
+    expect(componentSubscriptions.add()).toHaveBeenCalled;
+    expect(component.state.currentMode).toBe(null);
+    expect(component.VERTEX_RADIUS).toBe(6);
+    expect(component.EDGE_WIDTH).toBe(3);
+    expect(component.selectedEdgeWeightValue).toBe(0);
+    expect(component.shouldShowWrongWeightWarning).toBe(false);
+    expect(component.isMobile).toBe(false);
+    spyOn(deviceInfoService, 'isMobileDevice').and.callThrough;
+    expect(deviceInfoService.isMobileDevice()).toHaveBeenCalled;
+  });
+
+  it('should set component properties when ngAfterViewInit() is called', () => {
+    component.ngAfterViewInit();
+    spyOn(element.nativeElement, 'querySelectorAll').and.callThrough;
+    expect(element.nativeElement.querySelectorAll()).toHaveBeenCalled;
+  });
+
+  it('should return an edge color', () => {
+    component.interactionIsActive = false;
+    c
   });
 });
