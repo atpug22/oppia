@@ -22,20 +22,22 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { GraphVizComponent } from './graph-viz.component';
-import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { Subscription } from 'rxjs';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { UtilsService } from 'services/utils.service';
-import { EdgeCentre, GraphDetailService } from './graph-detail.service';
-import { ElementRef } from '@angular/core';
-
-describe('GraphVizComponent', () => {
+import { GraphDetailService } from './graph-detail.service';
+import { ElementRef, Pipe } from '@angular/core';
+import { TranslatePipe } from 'filters/translate.pipe';
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
+fdescribe('GraphVizComponent', () => {
   let component: GraphVizComponent;
   let fixture: ComponentFixture<GraphVizComponent>;
-  let interactionsExtensionsConstants: InteractionsExtensionsConstants;
-  let playerPositionService: PlayerPositionService;
   let deviceInfoService: DeviceInfoService;
   let focusManagerService: FocusManagerService;
   let utilsService: UtilsService;
@@ -49,8 +51,8 @@ describe('GraphVizComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [GraphVizComponent],
-      providers: [UtilsService],
+      declarations: [GraphVizComponent, MockTranslatePipe],
+      providers: [UtilsService, TranslatePipe],
     }).compileComponents();
   }));
 
@@ -58,22 +60,19 @@ describe('GraphVizComponent', () => {
     fixture = TestBed.createComponent(GraphVizComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    playerPositionService = TestBed.inject(PlayerPositionService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     focusManagerService = TestBed.inject(FocusManagerService);
     utilsService = TestBed.inject(UtilsService);
     element = TestBed.inject(ElementRef);
     graphDetailService = TestBed.inject(GraphDetailService);
-    interactionsExtensionsConstants = TestBed.inject(
-      InteractionsExtensionsConstants);
   });
 
   // eslint-disable-next-line max-len
-  it('should successfully instantiate the component from beforeEach block', () => {
+  fit('should successfully instantiate the component from beforeEach block', () => {
     expect(component).toBeDefined();
   });
 
-  it('should set component properties when ngOnInit() is called', () => {
+  fit('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     spyOn(componentSubscriptions, 'add').and.callThrough;
     expect(componentSubscriptions.add()).toHaveBeenCalled;
@@ -87,77 +86,78 @@ describe('GraphVizComponent', () => {
     expect(deviceInfoService.isMobileDevice()).toHaveBeenCalled;
   });
 
-  it('should set component properties when ngAfterViewInit() is called', () => {
-    component.ngAfterViewInit();
-    spyOn(element.nativeElement, 'querySelectorAll').and.callThrough;
-    expect(element.nativeElement.querySelectorAll()).toHaveBeenCalled;
-  });
+  fit(
+    'should set component properties when ngAfterViewInit() is called', () => {
+      component.ngAfterViewInit();
+      spyOn(element.nativeElement, 'querySelectorAll').and.callThrough;
+      expect(element.nativeElement.querySelectorAll()).toHaveBeenCalled;
+    });
 
-  it('should return black color if interaction is not active', () => {
+  fit('should return black color if interaction is not active', () => {
     component.interactionIsActive = false;
     expect(component.getEdgeColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return red color if current mode is delete mode', () => {
+  fit('should return red color if current mode is delete mode', () => {
     component.canDeleteEdge = true;
     component.state.currentMode = 3;
     component.state.hoveredEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(DELETE_COLOR);
   });
 
-  it('should return aqua color on hovering over edge', () => {
+  fit('should return aqua color on hovering over edge', () => {
     component.state.hoveredEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return orange color if edge is selected', () => {
+  fit('should return orange color if edge is selected', () => {
     component.state.selectedEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(SELECT_COLOR);
   });
 
-  it('should return black color in default case', () => {
+  fit('should return black color in default case', () => {
     expect(component.getEdgeColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return black color if interaction is not active', () => {
+  fit('should return black color if interaction is not active', () => {
     component.interactionIsActive = false;
     expect(component.getVertexColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return red color if current mode is delete mode', () => {
+  fit('should return red color if current mode is delete mode', () => {
     component.canDeleteVertex = true;
     component.state.currentMode = 3;
     component.state.hoveredVertex = 1;
     expect(component.getVertexColor(1)).toEqual(DELETE_COLOR);
   });
 
-  it('should return aqua color on dragging the vertex', () => {
+  fit('should return aqua color on dragging the vertex', () => {
     component.state.currentlyDraggedVertex = 1;
     expect(component.getVertexColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return aqua color on hovering over vertex', () => {
+  fit('should return aqua color on hovering over vertex', () => {
     component.state.hoveredVertex = 1;
     expect(component.getVertexColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return orange color if Vertex is selected', () => {
+  fit('should return orange color if Vertex is selected', () => {
     component.state.selectedVertex = 1;
     expect(component.getVertexColor(1)).toEqual(SELECT_COLOR);
   });
 
-  it('should return black color in default case', () => {
+  fit('should return black color in default case', () => {
     expect(component.getVertexColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should get directed edge Arrow points', () => {
+  fit('should get directed edge Arrow points', () => {
     component.graph = { vertices: [{
-      x: 1.0,
-      y: 1.0,
+      x: 0.0,
+      y: 0.0,
       label: 'a'
     }, {
-      x: 4.0,
-      y: 5.0,
+      x: 3.0,
+      y: 4.0,
       label: 'b'
     }],
     edges: [{
@@ -170,14 +170,13 @@ describe('GraphVizComponent', () => {
     isLabeled: true
     };
     let arrowPoints = component.getDirectedEdgeArrowPoints(0);
-    expect(arrowPoints).toBe('');
+    spyOn(graphDetailService, 'getDirectedEdgeArrowPoints').and.callThrough();
+    // eslint-disable-next-line max-len
+    expect(graphDetailService.getDirectedEdgeArrowPoints).toHaveBeenCalledWith(component.graph, 0);
+    expect(arrowPoints).toBe('0.6,0.8 -1.4,-10.2 -9.4,-4.2');
   });
 
-  it('should mouse move graph svg', () => {
-    component.mousemoveGraphSVG('click');
-  });
-
-  it('should add vertices to graph', () => {
+  fit('should add vertices to graph', () => {
     component.state.currentMode = 2;
     component.canAddVertex = true;
     component.state.mouseX = 1;
@@ -192,7 +191,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.selectedVertex).toBe(null);
   });
 
-  it('should set component properties when initButtons() is called', () => {
+  fit('should set component properties when initButtons() is called', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -219,7 +218,7 @@ describe('GraphVizComponent', () => {
     ]);
   });
 
-  it('should set helptext in case of mobile device', () => {
+  fit('should set helptext in case of mobile device', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -241,7 +240,7 @@ describe('GraphVizComponent', () => {
     expect(component.helpText).toBe('');
   });
 
-  it('should show helptext in case of mobile device', () => {
+  fit('should show helptext in case of mobile device', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -253,7 +252,7 @@ describe('GraphVizComponent', () => {
     expect(component.helpText).toBe('');
   });
 
-  it('should toggle graph option', () => {
+  fit('should toggle graph option', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -303,7 +302,7 @@ describe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to ADD EDGE mode with helptext in mobile device', () => {
+  fit('should set current mode to ADD EDGE mode with helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(1);
     expect(component.state.currentMode).toBe(1);
@@ -317,7 +316,7 @@ describe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to MOVE mode with helptext in mobile device', () => {
+  fit('should set current mode to MOVE mode with helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(0);
     expect(component.state.currentMode).toBe(0);
@@ -331,7 +330,7 @@ describe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to ADD VERTEX mode without helptext in mobile device', () => {
+  fit('should set current mode to ADD VERTEX mode without helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(2);
     expect(component.state.currentMode).toBe(2);
@@ -343,7 +342,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should set current mode in non-mobile device', () => {
+  fit('should set current mode in non-mobile device', () => {
     component.isMobile = false;
     component.setMode(1);
     expect(component.state.currentMode).toBe(1);
@@ -355,13 +354,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should activate mode on clicking on mode', () => {
-    component.onClickModeButton(1, {});
-    component.interactionIsActive = true;
-    expect(component.state.currentMode).toBe(1);
-  });
-
-  it('should delete vertex on click', () => {
+  fit('should delete vertex on click', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -382,6 +375,7 @@ describe('GraphVizComponent', () => {
       isLabeled: true
     };
     component.state.currentMode = 3;
+    component.canDeleteVertex = true;
     component.onClickVertex(1);
     expect(component.graph).toBe({
       vertices: [{
@@ -397,7 +391,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should begin edit vertex label on selecting vertex', () => {
+  fit('should begin edit vertex label on selecting vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -426,7 +420,7 @@ describe('GraphVizComponent', () => {
       'vertexLabelEditBegun');
   });
 
-  it('should begin add edge on selecting vertex in Mobile Devices', () => {
+  fit('should begin add edge on selecting vertex in Mobile Devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -451,7 +445,7 @@ describe('GraphVizComponent', () => {
       'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT');
   });
 
-  it('should begin move vertex in Mobile Devices', () => {
+  fit('should begin move vertex in Mobile Devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -470,17 +464,19 @@ describe('GraphVizComponent', () => {
     component.isMobile = true;
     component.state.currentMode = 0;
     component.canMoveVertex = true;
+    component.state.mouseX = 1;
+    component.state.mouseY = 1;
     component.onClickVertex(0);
     expect(component.state.currentlyDraggedVertex).toBe(0);
     expect(component.state.vertexDragStartX).toBe(1);
     expect(component.state.vertexDragStartY).toBe(1);
-    expect(component.state.mouseDragStartX).toBe(2);
-    expect(component.state.mouseDragStartY).toBe(2);
+    expect(component.state.mouseDragStartX).toBe(1);
+    expect(component.state.mouseDragStartY).toBe(1);
     expect(component.helpText).toBe(
       'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT');
   });
 
-  it('should not add edge if final vertex equals initial vertex', () => {
+  fit('should not add edge if final vertex equals initial vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -507,7 +503,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(null);
   });
 
-  it('should add edge if final vertex is given', () => {
+  fit('should add edge if final vertex is given', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -537,7 +533,7 @@ describe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(null);
   });
 
-  it('should move vertex when dragged in mobile devices', () => {
+  fit('should move vertex when dragged in mobile devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -573,5 +569,354 @@ describe('GraphVizComponent', () => {
       'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
   });
 
-  
+  fit('should start adding edge on mouse down', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.currentMode = 1;
+    component.canAddEdge = true;
+    component.onMousedownVertex(0);
+    expect(component.state.addEdgeVertex).toBe(0);
+  });
+
+  fit('should begin move vertex on mouse down vertex', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.currentMode = 0;
+    component.canMoveVertex = true;
+    component.state.mouseX = 1;
+    component.state.mouseY = 1;
+    component.onClickVertex(0);
+    expect(component.state.currentlyDraggedVertex).toBe(0);
+    expect(component.state.vertexDragStartX).toBe(1);
+    expect(component.state.vertexDragStartY).toBe(1);
+    expect(component.state.mouseDragStartX).toBe(1);
+    expect(component.state.mouseDragStartY).toBe(1);
+  });
+
+  fit('should show the hovered vertex on mouse leave vertex', () => {
+    component.state.hoveredVertex = 1;
+    component.onMousedownVertex(1);
+    expect(component.state.hoveredVertex).toBe(1);
+  });
+
+  fit('should begin edit vertex label on clicking on vertex', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.canEditVertexLabel = true;
+    component.onClickVertexLabel(1);
+    expect(component.state.selectedVertex).toBe(1);
+    spyOn(focusManagerService, 'setFocus').and.callThrough();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'vertexLabelEditBegun');
+  });
+
+  fit('should delete edge in delete mode', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.currentMode = 3;
+    component.canDeleteEdge = true;
+    component.onClickEdge(0);
+    expect(component.graph.edges).toBe([]);
+    expect(component.state.hoveredEdge).toBe(null);
+  });
+
+  fit('should begin edit edge weight on selecting edge', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.currentMode = 2;
+    component.canEditEdgeWeight = true;
+    component.onClickVertex(0);
+    expect(component.state.selectedEdge).toBe(0);
+    expect(component.selectedEdgeWeightValue).toBe(1);
+    expect(component.shouldShowWrongWeightWarning).toBe(false);
+    spyOn(focusManagerService, 'setFocus').and.callThrough();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'edgeWeightEditBegun');
+  });
+
+  fit('should begin edit edge weight on clicking on edge', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.canEditEdgeWeight = true;
+    component.onClickVertex(0);
+    expect(component.state.selectedEdge).toBe(0);
+    expect(component.selectedEdgeWeightValue).toBe(1);
+    expect(component.shouldShowWrongWeightWarning).toBe(false);
+    spyOn(focusManagerService, 'setFocus').and.callThrough();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'edgeWeightEditBegun');
+  });
+
+  fit('should add edge to final vertex on mouse up', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.addEdgeVertex = 0;
+    component.state.currentMode = 1;
+    component.state.hoveredVertex = 1;
+    component.onMouseupDocument();
+    expect(component.graph.edges).toBe([{
+      src: 0,
+      dst: 1,
+      weight: 1 }]);
+    expect(component.state.addEdgeVertex).toBe(null);
+  });
+
+  fit('should move vertex on mouse up document', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: 'b'
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.isMobile = true;
+    component.state.currentlyDraggedVertex = 1;
+    component.state.currentMode = 0;
+    component.state.mouseX = 3;
+    component.state.mouseY = 3;
+    component.state.vertexDragStartX = 2;
+    component.state.vertexDragStartY = 2;
+    component.state.mouseDragStartX = 2;
+    component.state.mouseDragStartY = 2;
+    component.onMouseupDocument();
+    expect(component.state.currentlyDraggedVertex).toBe(null);
+    expect(component.state.vertexDragStartX).toBe(0);
+    expect(component.state.vertexDragStartY).toBe(0);
+    expect(component.state.mouseDragStartX).toBe(0);
+    expect(component.state.mouseDragStartY).toBe(0);
+  });
+
+  fit('should return selected Vertex label', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: ''
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.selectedVertex = 0;
+    let vertexLabel = component.selectedVertexLabel;
+    expect(vertexLabel).toBe('a');
+    component.state.selectedVertex = 1;
+    vertexLabel = component.selectedVertexLabel;
+    expect(vertexLabel).toBe('');
+  });
+
+  fit('should set selected Vertex label', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: ''
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: ''
+      }],
+      edges: [],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.selectedVertex = 0;
+    component.selectedVertexLabel = 'a';
+    let spy = spyOn(utilsService, 'isDefined').and.callThrough();
+    expect(spy).toHaveBeenCalledWith('a');
+    component.state.selectedVertex = 0;
+    let vertexLabel = component.selectedVertexLabel;
+    expect(vertexLabel).toBe('a');
+  });
+
+  fit('should return selected edge weight', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: 'a'
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: ''
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: 1
+      }, {
+        src: 1,
+        dst: 0,
+        weight: null
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.selectedEdge = 0;
+    let edgeWeight = component.selectedEdgeWeight;
+    expect(edgeWeight).toBe(1);
+    component.state.selectedEdge = 1;
+    edgeWeight = component.selectedEdgeWeight;
+    expect(edgeWeight).toBe('');
+  });
+
+  fit('should set selected Edge Weight', () => {
+    component.graph = {
+      vertices: [{
+        x: 1.0,
+        y: 1.0,
+        label: ''
+      }, {
+        x: 2.0,
+        y: 2.0,
+        label: ''
+      }],
+      edges: [{
+        src: 0,
+        dst: 1,
+        weight: null
+      }],
+      isDirected: true,
+      isWeighted: true,
+      isLabeled: true
+    };
+    component.state.selectedEdge = 0;
+    component.selectedEdgeWeight = 1;
+    let spy = spyOn(utilsService, 'isDefined').and.callThrough();
+    expect(spy).toHaveBeenCalledWith(1);
+    component.state.selectedEdge = 0;
+    let edgeWeight = component.selectedEdgeWeight;
+    expect(edgeWeight).toBe(1);
+  });
+
+  fit('should check for valid edge weight', () => {
+    component.selectedEdgeWeightValue = 1;
+    let validEdge = component.isValidEdgeWeight();
+    expect(validEdge).toBe(true);
+    component.selectedEdgeWeightValue = '';
+    validEdge = component.isValidEdgeWeight();
+    expect(validEdge).toBe(false);
+  });
 });
