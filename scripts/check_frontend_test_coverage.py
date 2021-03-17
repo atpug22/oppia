@@ -122,7 +122,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'graph-input-validation.service.ts',
     'graph-layout.service.ts',
     'graph-property-editor.directive.ts',
-    'graph-viz.component.ts',
     'hint-and-solution-buttons.directive.ts',
     'hint-editor.directive.ts',
     'html-editor.directive.ts',
