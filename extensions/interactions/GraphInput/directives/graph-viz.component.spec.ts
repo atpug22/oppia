@@ -74,11 +74,11 @@ fdescribe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should successfully instantiate the component from beforeEach block', () => {
+  fit('should successfully instantiate the component from beforeEach block', () => {
     expect(component).toBeDefined();
   });
 
-  it('should set component properties when ngOnInit() is called', () => {
+  fit('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     spyOn(componentSubscriptions, 'add').and.callThrough;
     expect(componentSubscriptions.add()).toHaveBeenCalled;
@@ -99,64 +99,64 @@ fdescribe('GraphVizComponent', () => {
       expect(element.nativeElement.querySelectorAll()).toHaveBeenCalled;
     });
 
-  it('should return black color if interaction is not active', () => {
+  fit('should return black color if interaction is not active', () => {
     component.interactionIsActive = false;
     expect(component.getEdgeColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return red color if current mode is delete mode', () => {
+  fit('should return red color if current mode is delete mode', () => {
     component.canDeleteEdge = true;
     component.state.currentMode = 3;
     component.state.hoveredEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(DELETE_COLOR);
   });
 
-  it('should return aqua color on hovering over edge', () => {
+  fit('should return aqua color on hovering over edge', () => {
     component.state.hoveredEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return orange color if edge is selected', () => {
+  fit('should return orange color if edge is selected', () => {
     component.state.selectedEdge = 1;
     expect(component.getEdgeColor(1)).toEqual(SELECT_COLOR);
   });
 
-  it('should return black color in default case', () => {
+  fit('should return black color in default case', () => {
     expect(component.getEdgeColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return black color if interaction is not active', () => {
+  fit('should return black color if interaction is not active', () => {
     component.interactionIsActive = false;
     expect(component.getVertexColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should return red color if current mode is delete mode', () => {
+  fit('should return red color if current mode is delete mode', () => {
     component.canDeleteVertex = true;
     component.state.currentMode = 3;
     component.state.hoveredVertex = 1;
     expect(component.getVertexColor(1)).toEqual(DELETE_COLOR);
   });
 
-  it('should return aqua color on dragging the vertex', () => {
+  fit('should return aqua color on dragging the vertex', () => {
     component.state.currentlyDraggedVertex = 1;
     expect(component.getVertexColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return aqua color on hovering over vertex', () => {
+  fit('should return aqua color on hovering over vertex', () => {
     component.state.hoveredVertex = 1;
     expect(component.getVertexColor(1)).toEqual(HOVER_COLOR);
   });
 
-  it('should return orange color if Vertex is selected', () => {
+  fit('should return orange color if Vertex is selected', () => {
     component.state.selectedVertex = 1;
     expect(component.getVertexColor(1)).toEqual(SELECT_COLOR);
   });
 
-  it('should return black color in default case', () => {
+  fit('should return black color in default case', () => {
     expect(component.getVertexColor(1)).toEqual(DEFAULT_COLOR);
   });
 
-  it('should get directed edge Arrow points', () => {
+  fit('should get directed edge Arrow points', () => {
     component.graph = { vertices: [{
       x: 0.0,
       y: 0.0,
@@ -182,7 +182,7 @@ fdescribe('GraphVizComponent', () => {
     expect(arrowPoints).toBe('0.6,0.8 -1.4,-10.2 -9.4,-4.2');
   });
 
-  it('should add vertices to graph', () => {
+  fit('should add vertices to graph', () => {
     component.state.currentMode = 2;
     component.canAddVertex = true;
     component.state.mouseX = 1;
@@ -197,7 +197,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.selectedVertex).toBe(null);
   });
 
-  it('should set component properties when initButtons() is called', () => {
+  fit('should set component properties when initButtons() is called', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -224,7 +224,7 @@ fdescribe('GraphVizComponent', () => {
     ]);
   });
 
-  it('should set helptext in case of mobile device', () => {
+  fit('should set helptext in case of mobile device', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -246,7 +246,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.helpText).toBe('');
   });
 
-  it('should show helptext in case of mobile device', () => {
+  fit('should show helptext in case of mobile device', () => {
     component.canMoveVertex = true;
     component.canAddEdge = true;
     component.canAddVertex = true;
@@ -258,7 +258,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.helpText).toBe('');
   });
 
-  it('should toggle graph option', () => {
+  fit('should toggle graph option', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -308,7 +308,7 @@ fdescribe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to ADD EDGE mode with helptext in mobile device', () => {
+  fit('should set current mode to ADD EDGE mode with helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(1);
     expect(component.state.currentMode).toBe(1);
@@ -322,7 +322,7 @@ fdescribe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to MOVE mode with helptext in mobile device', () => {
+  fit('should set current mode to MOVE mode with helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(0);
     expect(component.state.currentMode).toBe(0);
@@ -336,7 +336,7 @@ fdescribe('GraphVizComponent', () => {
   });
 
   // eslint-disable-next-line max-len
-  it('should set current mode to ADD VERTEX mode without helptext in mobile device', () => {
+  fit('should set current mode to ADD VERTEX mode without helptext in mobile device', () => {
     component.isMobile = true;
     component.setMode(2);
     expect(component.state.currentMode).toBe(2);
@@ -348,7 +348,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should set current mode in non-mobile device', () => {
+  fit('should set current mode in non-mobile device', () => {
     component.isMobile = false;
     component.setMode(1);
     expect(component.state.currentMode).toBe(1);
@@ -360,7 +360,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should delete vertex on click', () => {
+  fit('should delete vertex on click', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -397,7 +397,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.hoveredVertex).toBe(null);
   });
 
-  it('should begin edit vertex label on selecting vertex', () => {
+  fit('should begin edit vertex label on selecting vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -426,7 +426,7 @@ fdescribe('GraphVizComponent', () => {
       'vertexLabelEditBegun');
   });
 
-  it('should begin add edge on selecting vertex in Mobile Devices', () => {
+  fit('should begin add edge on selecting vertex in Mobile Devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -451,7 +451,7 @@ fdescribe('GraphVizComponent', () => {
       'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT');
   });
 
-  it('should begin move vertex in Mobile Devices', () => {
+  fit('should begin move vertex in Mobile Devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -482,7 +482,7 @@ fdescribe('GraphVizComponent', () => {
       'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT');
   });
 
-  it('should not add edge if final vertex equals initial vertex', () => {
+  fit('should not add edge if final vertex equals initial vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -509,7 +509,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(null);
   });
 
-  it('should add edge if final vertex is given', () => {
+  fit('should add edge if final vertex is given', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -539,7 +539,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(null);
   });
 
-  it('should move vertex when dragged in mobile devices', () => {
+  fit('should move vertex when dragged in mobile devices', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -575,7 +575,7 @@ fdescribe('GraphVizComponent', () => {
       'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT');
   });
 
-  it('should start adding edge on mouse down', () => {
+  fit('should start adding edge on mouse down', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -597,7 +597,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(0);
   });
 
-  it('should begin move vertex on mouse down vertex', () => {
+  fit('should begin move vertex on mouse down vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -625,13 +625,13 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.mouseDragStartY).toBe(1);
   });
 
-  it('should show the hovered vertex on mouse leave vertex', () => {
+  fit('should show the hovered vertex on mouse leave vertex', () => {
     component.state.hoveredVertex = 1;
     component.onMousedownVertex(1);
     expect(component.state.hoveredVertex).toBe(1);
   });
 
-  it('should begin edit vertex label on clicking on vertex', () => {
+  fit('should begin edit vertex label on clicking on vertex', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -659,7 +659,7 @@ fdescribe('GraphVizComponent', () => {
       'vertexLabelEditBegun');
   });
 
-  it('should delete edge in delete mode', () => {
+  fit('should delete edge in delete mode', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -686,7 +686,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.hoveredEdge).toBe(null);
   });
 
-  it('should begin edit edge weight on selecting edge', () => {
+  fit('should begin edit edge weight on selecting edge', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -717,7 +717,7 @@ fdescribe('GraphVizComponent', () => {
       'edgeWeightEditBegun');
   });
 
-  it('should begin edit edge weight on clicking on edge', () => {
+  fit('should begin edit edge weight on clicking on edge', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -747,7 +747,7 @@ fdescribe('GraphVizComponent', () => {
       'edgeWeightEditBegun');
   });
 
-  it('should add edge to final vertex on mouse up', () => {
+  fit('should add edge to final vertex on mouse up', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -774,7 +774,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.addEdgeVertex).toBe(null);
   });
 
-  it('should move vertex on mouse up document', () => {
+  fit('should move vertex on mouse up document', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -807,7 +807,7 @@ fdescribe('GraphVizComponent', () => {
     expect(component.state.mouseDragStartY).toBe(0);
   });
 
-  it('should return selected Vertex label', () => {
+  fit('should return selected Vertex label', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -831,7 +831,7 @@ fdescribe('GraphVizComponent', () => {
     expect(vertexLabel).toBe('');
   });
 
-  it('should set selected Vertex label', () => {
+  fit('should set selected Vertex label', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -856,7 +856,7 @@ fdescribe('GraphVizComponent', () => {
     expect(vertexLabel).toBe('a');
   });
 
-  it('should return selected edge weight', () => {
+  fit('should return selected edge weight', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -888,7 +888,7 @@ fdescribe('GraphVizComponent', () => {
     expect(edgeWeight).toBe('');
   });
 
-  it('should set selected Edge Weight', () => {
+  fit('should set selected Edge Weight', () => {
     component.graph = {
       vertices: [{
         x: 1.0,
@@ -917,7 +917,7 @@ fdescribe('GraphVizComponent', () => {
     expect(edgeWeight).toBe(1);
   });
 
-  it('should check for valid edge weight', () => {
+  fit('should check for valid edge weight', () => {
     component.selectedEdgeWeightValue = 1;
     let validEdge = component.isValidEdgeWeight();
     expect(validEdge).toBe(true);
