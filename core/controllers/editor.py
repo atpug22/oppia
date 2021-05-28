@@ -711,6 +711,7 @@ class EditorAutosaveHandler(ExplorationHandler):
             change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in change_list_dict]
+            print(change_list_dict)
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)

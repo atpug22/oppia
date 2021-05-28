@@ -212,7 +212,7 @@ class ExplorationModel(base_models.VersionedModel):
     # A boolean indicating whether correctness feedback is enabled in this
     # exploration.
     correctness_feedback_enabled = datastore_services.BooleanProperty(
-        default=False, indexed=True)
+        default=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
