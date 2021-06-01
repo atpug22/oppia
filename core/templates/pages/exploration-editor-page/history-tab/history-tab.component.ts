@@ -203,7 +203,6 @@ angular.module('oppia').component('historyTab', {
           ctrl.totalExplorationVersionMetadata[earlierIndex]);
         ctrl.compareVersionMetadata.laterVersion = (
           ctrl.totalExplorationVersionMetadata[laterIndex]);
-
         CompareVersionsService.getDiffGraphData(
           earlierComparedVersion, laterComparedVersion).then(
           function(response) {
@@ -211,6 +210,8 @@ angular.module('oppia').component('historyTab', {
             $log.info(response);
 
             ctrl.diffData = response;
+            // eslint-disable-next-line no-console
+            console.log('diff Data = === ' + JSON.stringify(ctrl.diffData));
             ctrl.earlierVersionHeader = getVersionHeader(
               ctrl.compareVersionMetadata.earlierVersion);
             ctrl.laterVersionHeader = getVersionHeader(

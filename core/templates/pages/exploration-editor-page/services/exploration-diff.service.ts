@@ -201,6 +201,8 @@ export class ExplorationDiffService {
     let stateIds = v1Info.stateIds;
     let originalStateIds = cloneDeep(stateIds);
 
+    // eslint-disable-next-line no-console
+    console.log('changelistdata = =' + JSON.stringify(changeListData));
     changeListData.forEach(changeListDatum => {
       let changeList = changeListDatum.changeList;
       let directionForwards = changeListDatum.directionForwards;
@@ -260,6 +262,8 @@ export class ExplorationDiffService {
           delete stateIds[oldStateName];
           stateData[stateIds[newStateName]].newestStateName = newStateName;
         } else if (change.cmd === 'edit_state_property') {
+          // eslint-disable-next-line no-console
+          console.log(stateData);
           if (stateData[stateIds[(
             <ExplorationChangeEditStateProperty> change).state_name]]
             .stateProperty ===
@@ -319,6 +323,8 @@ export class ExplorationDiffService {
         adjMatrix[stateIds[stateName]][stateIds[defaultDest]] = true;
       }
     }
+    // eslint-disable-next-line no-console
+    console.log('adj = ' + JSON.stringify(adjMatrix));
     return adjMatrix;
   }
 

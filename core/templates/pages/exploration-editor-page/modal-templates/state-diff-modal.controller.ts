@@ -57,6 +57,8 @@ angular.module('oppia').controller('StateDiffModalController', [
         width: 50
       }).then(function(response) {
         $scope.yamlStrs.leftPane = response.data.yaml;
+        // eslint-disable-next-line no-console
+        console.log('left pane = ' + response.data.yaml);
       });
     } else {
       // Note: the timeout is needed or the string will be sent
@@ -73,6 +75,8 @@ angular.module('oppia').controller('StateDiffModalController', [
         width: 50
       }).then(function(response) {
         $scope.yamlStrs.rightPane = response.data.yaml;
+        // eslint-disable-next-line no-console
+        console.log('right pane = ' + response.data.yaml);
       });
     } else {
       // Note: the timeout is needed or the string will be sent

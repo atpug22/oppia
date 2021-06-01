@@ -5,31 +5,44 @@ def are_changes_mergeable(exp_id, version, change_list):
         return True
     else:
         complete_change_list = getCompleteChangeList(exp_id, version, latest_version)
-        if addition or deletion_of_state in backend:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(complete_change_list)
+        added_state_names = exp_versions_diff.added_state_names
+        deleted_state_names = exp_versions_diff.deleted_state_names
+        new_to_old_state_names = exp_versions_diff.old_to_new_state_names
+        old_to_new_state_names = exp_versions_diff.new_to_old_state_names
+
+        old_version = exp_fetchers.get_exploration_by_id(exp_id, version)
+        new_version = exp_fetchers.get_exploration_by_id(exp_id, latest_version)
+        if added_state_names.length > 0 or deleted_state_names.length > 0:
             return False
-        if rename_of_state in backend:
-            return False
-        changed_properties = {
+
+        changed_properties = {}
+        for change in complete_change_list:
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                changed_properties[change.state_name][change.property].append(change)
+
+        """ changed_properties = {
             "statename" : {
                 "property1": [changes],
                 "property2": [changes],
             }
-        }
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        } """
+
+        new_state_renamed = {}
         for change in change_list:
             is_change_mergeable = False
-            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                state = exploration.states[change.state_name]
+            if change.cmd == exp_domain.CMD_RENAME_STATE:
+                new_state_renamed[change.old_value] = change.new_value
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                old_state_name = change.state_name
+                new_state_name = old_to_new_state_name[old_state_name]
                 if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    if changed_properties.statename.content is not changed:
+                    if old_version[old_state_name].content == new_version[new_state_name].content:
                         is_change_mergeable = True
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                    if state.interaction_id is changed:
-                        return false
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                    state.update_linked_skill_id(change.new_value)
+                    if old_version[old_state_name].interaction_id == old_version[new_state_name].interaction_id:
+                        is_change_mergeable = True
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
                     state.update_interaction_customization_args(
