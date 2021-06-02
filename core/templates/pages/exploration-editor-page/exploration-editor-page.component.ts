@@ -18,6 +18,7 @@
  */
 
 import { State } from 'domain/state/StateObjectFactory';
+import { request } from 'node:http';
 
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
@@ -153,6 +154,8 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
+request('/pages/exploration-editor-page/editor-tab/templates/' +
+'modal-templates/customize-interaction-modal.template.html');
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').component('explorationEditorPage', {
@@ -160,7 +163,7 @@ angular.module('oppia').component('explorationEditorPage', {
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ContextService',
+    'ChangeListService', 'ContextService', 'CustomizationAngular',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
