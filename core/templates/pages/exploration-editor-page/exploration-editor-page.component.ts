@@ -18,7 +18,6 @@
  */
 
 import { State } from 'domain/state/StateObjectFactory';
-import { request } from 'node:http';
 
 require('components/on-screen-keyboard/on-screen-keyboard.component.ts');
 require(
@@ -163,7 +162,8 @@ angular.module('oppia').component('explorationEditorPage', {
   controller: [
     '$q', '$rootScope', '$scope', '$uibModal',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
-    'ChangeListService', 'ContextService', 'CustomizationAngular',
+    'ChangeListService', 'ContextService',
+    'CustomizeInteractionModalController',
     'EditabilityService', 'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
     'ExplorationDataService', 'ExplorationFeaturesBackendApiService',
