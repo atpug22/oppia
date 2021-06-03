@@ -153,7 +153,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/bottom-navbar-status.service.ts');
 
 require('components/on-screen-keyboard/on-screen-keyboard.component');
-request('/pages/exploration-editor-page/editor-tab/templates/' +
+require('/pages/exploration-editor-page/editor-tab/templates/' +
 'modal-templates/customize-interaction-modal.template.html');
 import { Subscription } from 'rxjs';
 
