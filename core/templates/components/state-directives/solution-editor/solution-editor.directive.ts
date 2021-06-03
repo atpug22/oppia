@@ -48,13 +48,11 @@ angular.module('oppia').directive('solutionEditor', [
   'ExplorationHtmlFormatterService',
   'StateCustomizationArgsService',
   'StateInteractionIdService',
-  'UrlInterpolationService',
   function(
       EditabilityService,
       ExplorationHtmlFormatterService,
       StateCustomizationArgsService,
-      StateInteractionIdService,
-      UrlInterpolationService) {
+      StateInteractionIdService) {
     return {
       restrict: 'E',
       scope: {},
@@ -65,7 +63,7 @@ angular.module('oppia').directive('solutionEditor', [
         onOpenSolutionEditor: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: require(
         '/components/state-directives/solution-editor/' +
         'solution-editor.directive.html'),
       controllerAs: '$ctrl',

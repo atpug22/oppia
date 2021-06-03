@@ -47,7 +47,7 @@ var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
 angular.module('oppia').directive('ruleEditor', [
-  '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
+  '$log', function($log) {
     return {
       restrict: 'E',
       scope: {},
@@ -59,7 +59,7 @@ angular.module('oppia').directive('ruleEditor', [
         rule: '=',
         modalId: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: require(
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

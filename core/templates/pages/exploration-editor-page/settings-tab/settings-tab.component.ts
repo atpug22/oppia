@@ -110,7 +110,7 @@ angular.module('oppia').component('settingsTab', {
     'ExplorationParamSpecsService', 'ExplorationRightsService',
     'ExplorationStatesService', 'ExplorationTagsService',
     'ExplorationTitleService', 'ExplorationWarningsService',
-    'RouterService', 'UrlInterpolationService', 'UserEmailPreferencesService',
+    'RouterService', 'UserEmailPreferencesService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService', 'WindowRef',
     'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
@@ -126,7 +126,7 @@ angular.module('oppia').component('settingsTab', {
         ExplorationParamSpecsService, ExplorationRightsService,
         ExplorationStatesService, ExplorationTagsService,
         ExplorationTitleService, ExplorationWarningsService,
-        RouterService, UrlInterpolationService, UserEmailPreferencesService,
+        RouterService, UserEmailPreferencesService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService, WindowRef,
         ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
@@ -148,7 +148,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/settings-tab/templates/' +
             'reassign-role-confirmation-modal.directive.html'),
           backdrop: true,
@@ -319,7 +319,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/settings-tab/templates/' +
             'remove-role-confirmation-modal.directive.html'),
           backdrop: true,
@@ -377,7 +377,7 @@ angular.module('oppia').component('settingsTab', {
       ctrl.previewSummaryTile = function() {
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/settings-tab/templates/' +
             'preview-summary-tile-modal.template.html'),
           backdrop: true,
@@ -390,7 +390,7 @@ angular.module('oppia').component('settingsTab', {
       ctrl.showTransferExplorationOwnershipModal = function() {
         AlertsService.clearWarnings();
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/settings-tab/templates/' +
             'transfer-exploration-ownership-modal.template.html'),
           backdrop: true,
@@ -406,7 +406,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/settings-tab/templates/' +
             'delete-exploration-modal.template.html'),
           backdrop: true,
@@ -432,7 +432,7 @@ angular.module('oppia').component('settingsTab', {
           var draftEmailBody = response.data.draft_email_body;
 
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/pages/exploration-editor-page/settings-tab/templates/' +
               'moderator-unpublish-exploration-modal.template.html'),
             backdrop: true,

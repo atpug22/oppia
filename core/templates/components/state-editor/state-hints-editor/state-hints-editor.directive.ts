@@ -52,8 +52,7 @@ require('services/generate-content-id.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/external-save.service.ts');
 
-angular.module('oppia').directive('stateHintsEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+angular.module('oppia').directive('stateHintsEditor', function() {
     return {
       restrict: 'E',
       scope: {
@@ -62,7 +61,7 @@ angular.module('oppia').directive('stateHintsEditor', [
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: require(
         '/components/state-editor/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
@@ -136,7 +135,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             ExternalSaveService.onExternalSave.emit();
 
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
@@ -159,7 +158,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             AlertsService.clearWarnings();
 
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-last-hint-modal.template.html'),
               backdrop: true,
@@ -184,7 +183,7 @@ angular.module('oppia').directive('stateHintsEditor', [
 
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-hint-modal.template.html'),
               backdrop: true,

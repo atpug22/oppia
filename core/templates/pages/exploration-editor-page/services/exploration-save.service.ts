@@ -82,7 +82,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'ExplorationTagsService', 'ExplorationTitleService',
   'ExplorationWarningsService', 'ExternalSaveService',
   'FocusManagerService', 'RouterService',
-  'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
+  'SiteAnalyticsService', 'StatesObjectFactory',
   'DEFAULT_LANGUAGE_CODE',
   function(
       $log, $q, $rootScope, $timeout, $uibModal, $window,
@@ -95,7 +95,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       ExplorationTagsService, ExplorationTitleService,
       ExplorationWarningsService, ExternalSaveService,
       FocusManagerService, RouterService,
-      SiteAnalyticsService, StatesObjectFactory, UrlInterpolationService,
+      SiteAnalyticsService, StatesObjectFactory,
       DEFAULT_LANGUAGE_CODE) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet).
@@ -121,7 +121,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
     var showCongratulatorySharingModal = function() {
       return $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        template: require(
           '/pages/exploration-editor-page/modal-templates/' +
           'post-publish-modal.template.html'),
         backdrop: true,
@@ -139,7 +139,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       var whenModalClosed = $q.defer();
 
       $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        template: require(
           '/pages/exploration-editor-page/modal-templates/' +
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
@@ -241,7 +241,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
       discardChanges: function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
             'confirm-discard-changes-modal.template.html'),
           backdrop: 'static',
@@ -252,7 +252,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           ExternalSaveService.onExternalSave.emit();
 
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/pages/exploration-editor-page/modal-templates/' +
               'editor-reloading-modal.template.html'),
             backdrop: 'static',
@@ -295,7 +295,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
           var modalInstance = $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-metadata-modal.template.html'),
             backdrop: 'static',
@@ -403,7 +403,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           }
 
           var modalInstance = $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-save-modal.template.html'),
             backdrop: 'static',

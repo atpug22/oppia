@@ -177,7 +177,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'StateClassifierMappingService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -200,7 +200,7 @@ angular.module('oppia').component('explorationEditorPage', {
         StateClassifierMappingService,
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataBackendApiService, UrlInterpolationService,
+        ThreadDataBackendApiService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -439,7 +439,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
@@ -488,7 +488,7 @@ angular.module('oppia').component('explorationEditorPage', {
         var EDITOR_TUTORIAL_MODE = 'editor';
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,

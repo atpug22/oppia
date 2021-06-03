@@ -67,164 +67,163 @@ require('components/state-editor/state-editor.constants.ajs.ts');
 require('services/contextual/window-dimensions.service');
 require('services/external-save.service.ts');
 
-angular.module('oppia').directive('stateSolutionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        onSaveSolution: '=',
-        refreshWarnings: '&',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-solution-editor/' +
+angular.module('oppia').directive('stateSolutionEditor', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      onSaveSolution: '=',
+      refreshWarnings: '&',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require(
+      '/components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
-      controller: [
-        '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
-        'ExplorationHtmlFormatterService', 'ExternalSaveService',
-        'SolutionValidityService', 'SolutionVerificationService',
-        'StateCustomizationArgsService', 'StateEditorService',
-        'StateHintsService', 'StateInteractionIdService',
-        'StateSolutionService', 'UrlInterpolationService',
-        'WindowDimensionsService',
-        'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
-        'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
-        'INTERACTION_SPECS',
-        function(
-            $filter, $scope, $uibModal, AlertsService, EditabilityService,
-            ExplorationHtmlFormatterService, ExternalSaveService,
-            SolutionValidityService, SolutionVerificationService,
-            StateCustomizationArgsService, StateEditorService,
-            StateHintsService, StateInteractionIdService,
-            StateSolutionService, UrlInterpolationService,
-            WindowDimensionsService,
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
-            INTERACTION_SPECS) {
-          var ctrl = this;
-          $scope.getInvalidSolutionTooltip = function() {
-            if (StateEditorService.isInQuestionMode()) {
-              return 'This solution doesn\'t correspond to an answer ' +
+    controller: [
+      '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
+      'ExplorationHtmlFormatterService', 'ExternalSaveService',
+      'SolutionValidityService', 'SolutionVerificationService',
+      'StateCustomizationArgsService', 'StateEditorService',
+      'StateHintsService', 'StateInteractionIdService',
+      'StateSolutionService',
+      'WindowDimensionsService',
+      'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
+      'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
+      'INTERACTION_SPECS',
+      function(
+          $filter, $scope, $uibModal, AlertsService, EditabilityService,
+          ExplorationHtmlFormatterService, ExternalSaveService,
+          SolutionValidityService, SolutionVerificationService,
+          StateCustomizationArgsService, StateEditorService,
+          StateHintsService, StateInteractionIdService,
+          StateSolutionService,
+          WindowDimensionsService,
+          INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
+          INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION,
+          INTERACTION_SPECS) {
+        var ctrl = this;
+        $scope.getInvalidSolutionTooltip = function() {
+          if (StateEditorService.isInQuestionMode()) {
+            return 'This solution doesn\'t correspond to an answer ' +
                 'marked as correct. Verify the rules specified for the ' +
                 'answers or change the solution.';
-            }
-            return 'This solution does not lead to another card. Verify the ' +
+          }
+          return 'This solution does not lead to another card. Verify the ' +
               'responses specified or change the solution.';
-          };
+        };
 
 
-          $scope.refreshWarnings()();
+        $scope.refreshWarnings()();
 
-          $scope.isSolutionValid = function() {
-            return StateEditorService.isCurrentSolutionValid();
-          };
+        $scope.isSolutionValid = function() {
+          return StateEditorService.isCurrentSolutionValid();
+        };
 
-          $scope.correctAnswerEditorHtml = (
-            ExplorationHtmlFormatterService.getInteractionHtml(
-              StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento,
-              false,
-              $scope.SOLUTION_EDITOR_FOCUS_LABEL, null));
+        $scope.correctAnswerEditorHtml = (
+          ExplorationHtmlFormatterService.getInteractionHtml(
+            StateInteractionIdService.savedMemento,
+            StateCustomizationArgsService.savedMemento,
+            false,
+            $scope.SOLUTION_EDITOR_FOCUS_LABEL, null));
 
-          $scope.toggleInlineSolutionEditorIsActive = function() {
-            $scope.inlineSolutionEditorIsActive = (
-              !$scope.inlineSolutionEditorIsActive);
-          };
+        $scope.toggleInlineSolutionEditorIsActive = function() {
+          $scope.inlineSolutionEditorIsActive = (
+            !$scope.inlineSolutionEditorIsActive);
+        };
 
-          $scope.getSolutionSummary = function() {
-            var solution = StateSolutionService.savedMemento;
-            var solutionAsPlainText =
+        $scope.getSolutionSummary = function() {
+          var solution = StateSolutionService.savedMemento;
+          var solutionAsPlainText =
               solution.getSummary(StateInteractionIdService.savedMemento);
-            solutionAsPlainText =
+          solutionAsPlainText =
               $filter('convertToPlainText')(solutionAsPlainText);
-            return solutionAsPlainText;
-          };
+          return solutionAsPlainText;
+        };
 
-          // This returns false if the current interaction ID is null.
-          $scope.isCurrentInteractionLinear = function() {
-            return (
-              StateInteractionIdService.savedMemento &&
+        // This returns false if the current interaction ID is null.
+        $scope.isCurrentInteractionLinear = function() {
+          return (
+            StateInteractionIdService.savedMemento &&
               INTERACTION_SPECS[
                 StateInteractionIdService.savedMemento
               ].is_linear);
-          };
+        };
 
-          $scope.openAddOrUpdateSolutionModal = function() {
-            AlertsService.clearWarnings();
-            ExternalSaveService.onExternalSave.emit();
-            $scope.inlineSolutionEditorIsActive = false;
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+        $scope.openAddOrUpdateSolutionModal = function() {
+          AlertsService.clearWarnings();
+          ExternalSaveService.onExternalSave.emit();
+          $scope.inlineSolutionEditorIsActive = false;
+          $uibModal.open({
+            template: require(
+              '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-or-update-solution-modal.template.html'),
-              backdrop: 'static',
-              controller: 'AddOrUpdateSolutionModalController'
-            }).result.then(function(result) {
-              StateSolutionService.displayed = result.solution;
-              StateSolutionService.saveDisplayedValue();
-              $scope.onSaveSolution(StateSolutionService.displayed);
-              var solutionIsValid = SolutionVerificationService.verifySolution(
-                StateEditorService.getActiveStateName(),
-                StateEditorService.getInteraction(),
-                StateSolutionService.savedMemento.correctAnswer
-              );
+            backdrop: 'static',
+            controller: 'AddOrUpdateSolutionModalController'
+          }).result.then(function(result) {
+            StateSolutionService.displayed = result.solution;
+            StateSolutionService.saveDisplayedValue();
+            $scope.onSaveSolution(StateSolutionService.displayed);
+            var solutionIsValid = SolutionVerificationService.verifySolution(
+              StateEditorService.getActiveStateName(),
+              StateEditorService.getInteraction(),
+              StateSolutionService.savedMemento.correctAnswer
+            );
 
-              SolutionValidityService.updateValidity(
-                StateEditorService.getActiveStateName(), solutionIsValid);
-              $scope.refreshWarnings()();
-              if (!solutionIsValid) {
-                if (StateEditorService.isInQuestionMode()) {
-                  AlertsService.addInfoMessage(
-                    INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION, 4000);
-                } else {
-                  AlertsService.addInfoMessage(
-                    INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
-                }
+            SolutionValidityService.updateValidity(
+              StateEditorService.getActiveStateName(), solutionIsValid);
+            $scope.refreshWarnings()();
+            if (!solutionIsValid) {
+              if (StateEditorService.isInQuestionMode()) {
+                AlertsService.addInfoMessage(
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION, 4000);
+              } else {
+                AlertsService.addInfoMessage(
+                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
               }
-            }, function() {
-              AlertsService.clearWarnings();
-            });
-          };
-
-          $scope.deleteSolution = function(index, evt) {
-            evt.stopPropagation();
-
+            }
+          }, function() {
             AlertsService.clearWarnings();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+          });
+        };
+
+        $scope.deleteSolution = function(index, evt) {
+          evt.stopPropagation();
+
+          AlertsService.clearWarnings();
+          $uibModal.open({
+            template: require(
+              '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-solution-modal.template.html'),
-              backdrop: true,
-              controller: 'ConfirmOrCancelModalController'
-            }).result.then(function() {
-              StateSolutionService.displayed = null;
-              StateSolutionService.saveDisplayedValue();
-              $scope.onSaveSolution(StateSolutionService.displayed);
-              StateEditorService.deleteCurrentSolutionValidity();
-            }, function() {
-              AlertsService.clearWarnings();
-            });
-          };
+            backdrop: true,
+            controller: 'ConfirmOrCancelModalController'
+          }).result.then(function() {
+            StateSolutionService.displayed = null;
+            StateSolutionService.saveDisplayedValue();
+            $scope.onSaveSolution(StateSolutionService.displayed);
+            StateEditorService.deleteCurrentSolutionValidity();
+          }, function() {
+            AlertsService.clearWarnings();
+          });
+        };
 
-          $scope.toggleSolutionCard = function() {
-            $scope.solutionCardIsShown = !$scope.solutionCardIsShown;
-          };
+        $scope.toggleSolutionCard = function() {
+          $scope.solutionCardIsShown = !$scope.solutionCardIsShown;
+        };
 
-          ctrl.$onInit = function() {
-            $scope.EditabilityService = EditabilityService;
-            $scope.solutionCardIsShown = (
-              !WindowDimensionsService.isWindowNarrow());
-            $scope.correctAnswer = null;
-            $scope.correctAnswerEditorHtml = '';
-            $scope.inlineSolutionEditorIsActive = false;
-            $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
-              'currentCorrectAnswerEditorHtmlForSolutionEditor');
-            $scope.StateHintsService = StateHintsService;
-            $scope.StateInteractionIdService = StateInteractionIdService;
-            $scope.StateSolutionService = StateSolutionService;
-            StateEditorService.updateStateSolutionEditorInitialised();
-          };
-        }
-      ]
-    };
-  }]);
+        ctrl.$onInit = function() {
+          $scope.EditabilityService = EditabilityService;
+          $scope.solutionCardIsShown = (
+            !WindowDimensionsService.isWindowNarrow());
+          $scope.correctAnswer = null;
+          $scope.correctAnswerEditorHtml = '';
+          $scope.inlineSolutionEditorIsActive = false;
+          $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+            'currentCorrectAnswerEditorHtmlForSolutionEditor');
+          $scope.StateHintsService = StateHintsService;
+          $scope.StateInteractionIdService = StateInteractionIdService;
+          $scope.StateSolutionService = StateSolutionService;
+          StateEditorService.updateStateSolutionEditorInitialised();
+        };
+      }
+    ]
+  };
+});

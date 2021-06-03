@@ -49,7 +49,7 @@ angular.module('oppia').directive('thumbnailUploader', [
         updateBgColor: '=',
         updateFilename: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: require(
         '/components/forms/custom-forms-directives/' +
         'thumbnail-uploader.directive.html'),
       controller: ['$rootScope', '$scope', '$uibModal',
@@ -177,7 +177,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               });
             };
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/components/forms/custom-forms-directives/' +
                 'edit-thumbnail-modal.template.html'),
               backdrop: 'static',

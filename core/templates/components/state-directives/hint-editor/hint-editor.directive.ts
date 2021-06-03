@@ -30,83 +30,82 @@ require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').directive('hintEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        hint: '=',
-        getIndexPlusOne: '&indexPlusOne',
-        getOnSaveFn: '&onSave',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/hint-editor/hint-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        'ContextService', 'EditabilityService',
-        'ExternalSaveService', 'StateHintsService',
-        function(
-            ContextService, EditabilityService,
-            ExternalSaveService, StateHintsService) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          ctrl.openHintEditor = function() {
-            if (ctrl.isEditable) {
-              ctrl.hintMemento = angular.copy(ctrl.hint);
-              ctrl.hintEditorIsOpen = true;
-            }
-          };
+angular.module('oppia').directive('hintEditor', function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      hint: '=',
+      getIndexPlusOne: '&indexPlusOne',
+      getOnSaveFn: '&onSave',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require(
+      '/components/state-directives/hint-editor/hint-editor.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      'ContextService', 'EditabilityService',
+      'ExternalSaveService', 'StateHintsService',
+      function(
+          ContextService, EditabilityService,
+          ExternalSaveService, StateHintsService) {
+        var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
+        ctrl.openHintEditor = function() {
+          if (ctrl.isEditable) {
+            ctrl.hintMemento = angular.copy(ctrl.hint);
+            ctrl.hintEditorIsOpen = true;
+          }
+        };
 
-          ctrl.saveThisHint = function() {
-            ctrl.hintEditorIsOpen = false;
-            var contentHasChanged = (
-              ctrl.hintMemento.hintContent.html !==
+        ctrl.saveThisHint = function() {
+          ctrl.hintEditorIsOpen = false;
+          var contentHasChanged = (
+            ctrl.hintMemento.hintContent.html !==
               ctrl.hint.hintContent.html);
-            ctrl.hintMemento = null;
-            if (contentHasChanged) {
-              var hintContentId = ctrl.hint.hintContent.contentId;
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                [hintContentId]);
-            }
-            ctrl.getOnSaveFn()();
-          };
+          ctrl.hintMemento = null;
+          if (contentHasChanged) {
+            var hintContentId = ctrl.hint.hintContent.contentId;
+            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              [hintContentId]);
+          }
+          ctrl.getOnSaveFn()();
+        };
 
-          ctrl.cancelThisHintEdit = function() {
-            ctrl.hint.hintContent =
+        ctrl.cancelThisHintEdit = function() {
+          ctrl.hint.hintContent =
               angular.copy(ctrl.hintMemento.hintContent);
-            ctrl.hintMemento = null;
-            ctrl.hintEditorIsOpen = false;
-          };
+          ctrl.hintMemento = null;
+          ctrl.hintEditorIsOpen = false;
+        };
 
-          ctrl.$onInit = function() {
-            ctrl.directiveSubscriptions.add(
-              ExternalSaveService.onExternalSave.subscribe(() => {
-                if (ctrl.hintEditorIsOpen &&
+        ctrl.$onInit = function() {
+          ctrl.directiveSubscriptions.add(
+            ExternalSaveService.onExternalSave.subscribe(() => {
+              if (ctrl.hintEditorIsOpen &&
                       ctrl.editHintForm.$valid) {
-                  ctrl.saveThisHint();
-                }
-              }));
-            ctrl.isEditable = EditabilityService.isEditable();
-            ctrl.StateHintsService = StateHintsService;
-            ctrl.editHintForm = {};
-            ctrl.hintEditorIsOpen = false;
-
-            ctrl.HINT_FORM_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: (
-                  ContextService.getEntityType() === 'question')
+                ctrl.saveThisHint();
               }
-            };
+            }));
+          ctrl.isEditable = EditabilityService.isEditable();
+          ctrl.StateHintsService = StateHintsService;
+          ctrl.editHintForm = {};
+          ctrl.hintEditorIsOpen = false;
 
-            ctrl.hintMemento = null;
+          ctrl.HINT_FORM_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
+            }
           };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
-        }
-      ]
-    };
-  }]);
+
+          ctrl.hintMemento = null;
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
+        };
+      }
+    ]
+  };
+});

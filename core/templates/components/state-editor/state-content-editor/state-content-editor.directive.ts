@@ -35,113 +35,112 @@ require('services/external-save.service.ts');
 
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').directive('stateContentEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      link: function(scope, element) {
-        // This allows the scope to be retrievable during Karma unit testing.
-        // See http://stackoverflow.com/a/29833832 for more details.
-        element[0].getControllerScope = function() {
-          return scope;
-        };
-      },
-      scope: {
-        getStateContentPlaceholder: '&stateContentPlaceholder',
-        getStateContentSaveButtonPlaceholder: (
-          '&stateContentSaveButtonPlaceholder'),
-        onSaveStateContent: '=',
-        showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-content-editor/' +
+angular.module('oppia').directive('stateContentEditor', function() {
+  return {
+    restrict: 'E',
+    link: function(scope, element) {
+      // This allows the scope to be retrievable during Karma unit testing.
+      // See http://stackoverflow.com/a/29833832 for more details.
+      element[0].getControllerScope = function() {
+        return scope;
+      };
+    },
+    scope: {
+      getStateContentPlaceholder: '&stateContentPlaceholder',
+      getStateContentSaveButtonPlaceholder: (
+        '&stateContentSaveButtonPlaceholder'),
+      onSaveStateContent: '=',
+      showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
+    },
+    template: require(
+      '/components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
-      controller: [
-        '$scope', 'ContextService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'ExternalSaveService',
-        'StateContentService', 'StateEditorService',
-        function(
-            $scope, ContextService, EditabilityService,
-            EditorFirstTimeEventsService, ExternalSaveService,
-            StateContentService, StateEditorService) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          $scope.isCardHeightLimitReached = function() {
-            var shadowPreviewCard = $(
-              '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-            );
-            var height = shadowPreviewCard.height();
-            return (height > 630);
-          };
+    controller: [
+      '$scope', 'ContextService', 'EditabilityService',
+      'EditorFirstTimeEventsService', 'ExternalSaveService',
+      'StateContentService', 'StateEditorService',
+      function(
+          $scope, ContextService, EditabilityService,
+          EditorFirstTimeEventsService, ExternalSaveService,
+          StateContentService, StateEditorService) {
+        var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
+        $scope.isCardHeightLimitReached = function() {
+          var shadowPreviewCard = $(
+            '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
+          );
+          var height = shadowPreviewCard.height();
+          return (height > 630);
+        };
 
-          $scope.hideCardHeightLimitWarning = function() {
-            $scope.cardHeightLimitWarningIsShown = false;
-          };
+        $scope.hideCardHeightLimitWarning = function() {
+          $scope.cardHeightLimitWarningIsShown = false;
+        };
 
-          var saveContent = function() {
-            StateContentService.saveDisplayedValue();
-            $scope.onSaveStateContent(StateContentService.displayed);
-            $scope.contentEditorIsOpen = false;
-          };
+        var saveContent = function() {
+          StateContentService.saveDisplayedValue();
+          $scope.onSaveStateContent(StateContentService.displayed);
+          $scope.contentEditorIsOpen = false;
+        };
 
-          $scope.openStateContentEditor = function() {
-            if ($scope.isEditable()) {
-              EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
-              $scope.contentEditorIsOpen = true;
-            }
-          };
+        $scope.openStateContentEditor = function() {
+          if ($scope.isEditable()) {
+            EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
+            $scope.contentEditorIsOpen = true;
+          }
+        };
 
-          $scope.onSaveContentButtonClicked = function() {
-            EditorFirstTimeEventsService.registerFirstSaveContentEvent();
-            var savedContent = StateContentService.savedMemento;
-            var contentHasChanged = (
-              savedContent.html !==
+        $scope.onSaveContentButtonClicked = function() {
+          EditorFirstTimeEventsService.registerFirstSaveContentEvent();
+          var savedContent = StateContentService.savedMemento;
+          var contentHasChanged = (
+            savedContent.html !==
               StateContentService.displayed.html);
-            if (contentHasChanged) {
-              var contentId = StateContentService.displayed.contentId;
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                [contentId]);
-            }
-            saveContent();
-          };
+          if (contentHasChanged) {
+            var contentId = StateContentService.displayed.contentId;
+            $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              [contentId]);
+          }
+          saveContent();
+        };
 
-          $scope.cancelEdit = function() {
-            StateContentService.restoreFromMemento();
-            $scope.contentEditorIsOpen = false;
-          };
-          ctrl.$onInit = function() {
-            $scope.HTML_SCHEMA = {
-              type: 'html',
-              ui_config: {
-                hide_complex_extensions: (
-                  ContextService.getEntityType() === 'question')
-              }
-            };
-            $scope.contentId = null;
-            $scope.StateContentService = StateContentService;
-            if (StateContentService.displayed) {
-              $scope.contentId = StateContentService.displayed.contentId;
+        $scope.cancelEdit = function() {
+          StateContentService.restoreFromMemento();
+          $scope.contentEditorIsOpen = false;
+        };
+        ctrl.$onInit = function() {
+          $scope.HTML_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: (
+                ContextService.getEntityType() === 'question')
             }
+          };
+          $scope.contentId = null;
+          $scope.StateContentService = StateContentService;
+          if (StateContentService.displayed) {
+            $scope.contentId = StateContentService.displayed.contentId;
+          }
 
-            $scope.contentEditorIsOpen = false;
-            $scope.isEditable = EditabilityService.isEditable;
-            $scope.cardHeightLimitWarningIsShown = true;
-            ctrl.directiveSubscriptions.add(
-              ExternalSaveService.onExternalSave.subscribe(
-                () => {
-                  if ($scope.contentEditorIsOpen) {
-                    saveContent();
-                  }
+          $scope.contentEditorIsOpen = false;
+          $scope.isEditable = EditabilityService.isEditable;
+          $scope.cardHeightLimitWarningIsShown = true;
+          ctrl.directiveSubscriptions.add(
+            ExternalSaveService.onExternalSave.subscribe(
+              () => {
+                if ($scope.contentEditorIsOpen) {
+                  saveContent();
                 }
-              )
-            );
-            StateEditorService.updateStateContentEditorInitialised();
-          };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
-        }
-      ]
-    };
-  }
-]);
+              }
+            )
+          );
+          StateEditorService.updateStateContentEditorInitialised();
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
+        };
+      }
+    ]
+  };
+}
+);

@@ -35,142 +35,141 @@ require(
 
 import { Subscription } from 'rxjs';
 
-angular.module('oppia').directive('hintAndSolutionButtons', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/' +
+angular.module('oppia').directive('hintAndSolutionButtons', function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    template: require(
+      '/components/button-directives/' +
         'hint-and-solution-buttons.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', 'ContextService', 'ExplorationPlayerStateService',
-        'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
-        'PlayerPositionService', 'PlayerTranscriptService',
-        'StatsReportingService',
-        function(
-            $rootScope, ContextService, ExplorationPlayerStateService,
-            HintAndSolutionModalService, HintsAndSolutionManagerService,
-            PlayerPositionService, PlayerTranscriptService,
-            StatsReportingService) {
-          var ctrl = this;
-          ctrl.directiveSubscriptions = new Subscription();
-          var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-          var resetLocalHintsArray = function() {
-            ctrl.hintIndexes = [];
-            var numHints = HintsAndSolutionManagerService.getNumHints();
-            for (var index = 0; index < numHints; index++) {
-              ctrl.hintIndexes.push(index);
-            }
-          };
+    controllerAs: '$ctrl',
+    controller: [
+      '$rootScope', 'ContextService', 'ExplorationPlayerStateService',
+      'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
+      'PlayerPositionService', 'PlayerTranscriptService',
+      'StatsReportingService',
+      function(
+          $rootScope, ContextService, ExplorationPlayerStateService,
+          HintAndSolutionModalService, HintsAndSolutionManagerService,
+          PlayerPositionService, PlayerTranscriptService,
+          StatsReportingService) {
+        var ctrl = this;
+        ctrl.directiveSubscriptions = new Subscription();
+        var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+        var resetLocalHintsArray = function() {
+          ctrl.hintIndexes = [];
+          var numHints = HintsAndSolutionManagerService.getNumHints();
+          for (var index = 0; index < numHints; index++) {
+            ctrl.hintIndexes.push(index);
+          }
+        };
 
-          ctrl.isHintButtonVisible = function(index) {
-            return (
-              HintsAndSolutionManagerService.isHintViewable(index) &&
+        ctrl.isHintButtonVisible = function(index) {
+          return (
+            HintsAndSolutionManagerService.isHintViewable(index) &&
               ctrl.displayedCard !== null &&
               ctrl.displayedCard.doesInteractionSupportHints());
-          };
+        };
 
-          ctrl.isSolutionButtonVisible = function() {
-            return HintsAndSolutionManagerService.isSolutionViewable();
-          };
+        ctrl.isSolutionButtonVisible = function() {
+          return HintsAndSolutionManagerService.isSolutionViewable();
+        };
 
-          ctrl.displayHintModal = function(index) {
-            ctrl.activeHintIndex = index;
-            var promise = (
-              HintAndSolutionModalService.displayHintModal(index));
-            promise.result.then(null, function() {
-              ctrl.activeHintIndex = null;
-            });
-            ctrl.isVisible = false;
-          };
+        ctrl.displayHintModal = function(index) {
+          ctrl.activeHintIndex = index;
+          var promise = (
+            HintAndSolutionModalService.displayHintModal(index));
+          promise.result.then(null, function() {
+            ctrl.activeHintIndex = null;
+          });
+          ctrl.isVisible = false;
+        };
 
-          ctrl.onClickSolutionButton = function() {
-            ctrl.solutionModalIsActive = true;
-            if (HintsAndSolutionManagerService.isSolutionConsumed()) {
+        ctrl.onClickSolutionButton = function() {
+          ctrl.solutionModalIsActive = true;
+          if (HintsAndSolutionManagerService.isSolutionConsumed()) {
+            ctrl.displaySolutionModal();
+          } else {
+            var interstitialModalPromise = (
+              HintAndSolutionModalService
+                .displaySolutionInterstitialModal());
+            interstitialModalPromise.result.then(function() {
               ctrl.displaySolutionModal();
-            } else {
-              var interstitialModalPromise = (
-                HintAndSolutionModalService
-                  .displaySolutionInterstitialModal());
-              interstitialModalPromise.result.then(function() {
-                ctrl.displaySolutionModal();
-              }, function() {
-                ctrl.solutionModalIsActive = false;
-              });
-            }
-          };
-
-          ctrl.displaySolutionModal = function() {
-            ctrl.solutionModalIsActive = true;
-            var inQuestionMode = (
-              ExplorationPlayerStateService.isInQuestionMode());
-            if (!_editorPreviewMode && !inQuestionMode) {
-              StatsReportingService.recordSolutionHit(
-                PlayerPositionService.getCurrentStateName());
-            }
-            var promise = HintAndSolutionModalService.displaySolutionModal();
-            promise.result.then(null, function() {
+            }, function() {
               ctrl.solutionModalIsActive = false;
             });
-          };
+          }
+        };
 
-          ctrl.isTooltipVisible = function() {
-            return HintsAndSolutionManagerService.isHintTooltipOpen();
-          };
-
-          ctrl.isHintConsumed = function(hintIndex) {
-            return HintsAndSolutionManagerService.isHintConsumed(hintIndex);
-          };
-
-          ctrl.isSolutionConsumed = function() {
-            return HintsAndSolutionManagerService.isSolutionConsumed();
-          };
-
-          ctrl.$onInit = function() {
-            ctrl.hintIndexes = [];
-            // Represents the index of the currently viewed hint.
-            ctrl.activeHintIndex = null;
-            ctrl.displayedCard = null;
+        ctrl.displaySolutionModal = function() {
+          ctrl.solutionModalIsActive = true;
+          var inQuestionMode = (
+            ExplorationPlayerStateService.isInQuestionMode());
+          if (!_editorPreviewMode && !inQuestionMode) {
+            StatsReportingService.recordSolutionHit(
+              PlayerPositionService.getCurrentStateName());
+          }
+          var promise = HintAndSolutionModalService.displaySolutionModal();
+          promise.result.then(null, function() {
             ctrl.solutionModalIsActive = false;
-            ctrl.currentlyOnLatestCard = true;
-            ctrl.isVisible = true;
-            resetLocalHintsArray();
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.onNewCardOpened.subscribe(
-                (newCard) => {
-                  ctrl.displayedCard = newCard;
-                  HintsAndSolutionManagerService.reset(
-                    newCard.getHints(), newCard.getSolution()
-                  );
+          });
+        };
+
+        ctrl.isTooltipVisible = function() {
+          return HintsAndSolutionManagerService.isHintTooltipOpen();
+        };
+
+        ctrl.isHintConsumed = function(hintIndex) {
+          return HintsAndSolutionManagerService.isHintConsumed(hintIndex);
+        };
+
+        ctrl.isSolutionConsumed = function() {
+          return HintsAndSolutionManagerService.isSolutionConsumed();
+        };
+
+        ctrl.$onInit = function() {
+          ctrl.hintIndexes = [];
+          // Represents the index of the currently viewed hint.
+          ctrl.activeHintIndex = null;
+          ctrl.displayedCard = null;
+          ctrl.solutionModalIsActive = false;
+          ctrl.currentlyOnLatestCard = true;
+          ctrl.isVisible = true;
+          resetLocalHintsArray();
+          ctrl.directiveSubscriptions.add(
+            PlayerPositionService.onNewCardOpened.subscribe(
+              (newCard) => {
+                ctrl.displayedCard = newCard;
+                HintsAndSolutionManagerService.reset(
+                  newCard.getHints(), newCard.getSolution()
+                );
+                resetLocalHintsArray();
+              }
+            )
+          );
+          ctrl.directiveSubscriptions.add(
+            PlayerPositionService.onActiveCardChanged.subscribe(
+              () => {
+                var displayedCardIndex =
+                    (PlayerPositionService.getDisplayedCardIndex());
+                ctrl.currentlyOnLatestCard =
+                    (PlayerTranscriptService.isLastCard(displayedCardIndex));
+                if (ctrl.currentlyOnLatestCard) {
                   resetLocalHintsArray();
                 }
-              )
-            );
-            ctrl.directiveSubscriptions.add(
-              PlayerPositionService.onActiveCardChanged.subscribe(
-                () => {
-                  var displayedCardIndex =
-                    (PlayerPositionService.getDisplayedCardIndex());
-                  ctrl.currentlyOnLatestCard =
-                    (PlayerTranscriptService.isLastCard(displayedCardIndex));
-                  if (ctrl.currentlyOnLatestCard) {
-                    resetLocalHintsArray();
-                  }
-                }
-              )
-            );
-            ctrl.directiveSubscriptions.add(
-              HintsAndSolutionManagerService.onTimeoutElapsed$.subscribe(
-                () => $rootScope.$apply())
-            );
-          };
-          ctrl.$onDestroy = function() {
-            ctrl.directiveSubscriptions.unsubscribe();
-          };
-        }
-      ]
-    };
-  }]);
+              }
+            )
+          );
+          ctrl.directiveSubscriptions.add(
+            HintsAndSolutionManagerService.onTimeoutElapsed$.subscribe(
+              () => $rootScope.$apply())
+          );
+        };
+        ctrl.$onDestroy = function() {
+          ctrl.directiveSubscriptions.unsubscribe();
+        };
+      }
+    ]
+  };
+});

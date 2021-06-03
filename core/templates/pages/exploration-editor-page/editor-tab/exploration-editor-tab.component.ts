@@ -79,7 +79,7 @@ angular.module('oppia').component('explorationEditorTab', {
     'LoaderService',
     'RouterService', 'SiteAnalyticsService', 'StateEditorRefreshService',
     'StateEditorService', 'StateTutorialFirstTimeService',
-    'UrlInterpolationService', 'UserExplorationPermissionsService',
+    'UserExplorationPermissionsService',
     function(
         $scope, $templateCache, $timeout, $uibModal, EditabilityService,
         ExplorationCorrectnessFeedbackService, ExplorationFeaturesService,
@@ -88,7 +88,7 @@ angular.module('oppia').component('explorationEditorTab', {
         LoaderService,
         RouterService, SiteAnalyticsService, StateEditorRefreshService,
         StateEditorService, StateTutorialFirstTimeService,
-        UrlInterpolationService, UserExplorationPermissionsService) {
+        UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       // Replace the ng-joyride template with one that uses <[...]>
@@ -286,7 +286,7 @@ angular.module('oppia').component('explorationEditorTab', {
         });
         if (shouldPrompt) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',

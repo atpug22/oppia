@@ -108,7 +108,7 @@ angular.module('oppia').directive('stateResponses', [
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      template: require(
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
@@ -118,7 +118,7 @@ angular.module('oppia').directive('stateResponses', [
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
         'StateSolicitAnswerDetailsService',
-        'UrlInterpolationService', 'WindowDimensionsService',
+        'WindowDimensionsService',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
@@ -130,7 +130,7 @@ angular.module('oppia').directive('stateResponses', [
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
             StateSolicitAnswerDetailsService,
-            UrlInterpolationService, WindowDimensionsService,
+            WindowDimensionsService,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
@@ -311,7 +311,7 @@ angular.module('oppia').directive('stateResponses', [
             var addState = $scope.addState;
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
@@ -359,7 +359,7 @@ angular.module('oppia').directive('stateResponses', [
 
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,

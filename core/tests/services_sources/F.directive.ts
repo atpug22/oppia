@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-angular.module('oppia').directive('FDirective', [
-  function() {
+angular.module('oppia').directive('FDirective', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

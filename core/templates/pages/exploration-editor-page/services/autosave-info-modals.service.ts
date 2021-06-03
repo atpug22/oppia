@@ -31,15 +31,15 @@ require(
   'lost-changes-modal.controller.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
-  '$uibModal', 'LocalStorageService', 'UrlInterpolationService',
+  '$uibModal', 'LocalStorageService',
   function(
-      $uibModal, LocalStorageService, UrlInterpolationService) {
+      $uibModal, LocalStorageService) {
     var _isModalOpen = false;
 
     return {
       showNonStrictValidationFailModal: function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
             'save-validation-fail-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
@@ -58,7 +58,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
       },
       showVersionMismatchModal: function(lostChanges) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
             'save-version-mismatch-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
@@ -78,7 +78,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
       },
       showLostChangesModal: function(lostChanges, explorationId) {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          template: require(
             '/pages/exploration-editor-page/modal-templates/' +
             'lost-changes-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.

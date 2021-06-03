@@ -247,7 +247,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         return;
       }
       $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        template: require(
           '/pages/exploration-editor-page/modal-templates/' +
           'confirm-leave-modal.template.html'),
         backdrop: 'static',

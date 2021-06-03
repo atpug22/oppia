@@ -63,8 +63,17 @@ require('services/context.service');
 
 import { Subscription } from 'rxjs';
 
+
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
+    // eslint-disable-next-line max-len
+    const stateInteractionEditor = require(
+      'components/state-editor/state-interaction-editor/' +
+      'state-interaction-editor.directive.html');
+    // eslint-disable-next-line max-len
+    const customizeInteractionModalTemplate = require(
+      'pages/exploration-editor-page/editor-tab/templates/' +
+          'modal-templates/customize-interaction-modal.template.html');
     return {
       restrict: 'E',
       link: function(scope, element) {
@@ -83,9 +92,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         recomputeGraph: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '<'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-interaction-editor/' +
-        'state-interaction-editor.directive.html'),
+      template: stateInteractionEditor,
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'EditabilityService', 'ExplorationHtmlFormatterService',
@@ -93,7 +100,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
         'ResponsesService', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateNextContentIdIndexService',
-        'StateSolutionService', 'UrlInterpolationService',
+        'StateSolutionService',
         'WindowDimensionsService', 'INTERACTION_SPECS', function(
             $scope, $uibModal, AlertsService, ContextService,
             EditabilityService, ExplorationHtmlFormatterService,
@@ -101,7 +108,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             ResponsesService, StateContentService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateNextContentIdIndexService,
-            StateSolutionService, UrlInterpolationService,
+            StateSolutionService,
             WindowDimensionsService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -229,9 +236,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
               AlertsService.clearWarnings();
 
               $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/editor-tab/templates/' +
-                  'modal-templates/customize-interaction-modal.template.html'),
+                // eslint-disable-next-line max-len
+                template: customizeInteractionModalTemplate,
                 resolve: {
                   showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
                     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
@@ -252,7 +258,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
           $scope.deleteInteraction = function() {
             AlertsService.clearWarnings();
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              template: require(
                 '/pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,

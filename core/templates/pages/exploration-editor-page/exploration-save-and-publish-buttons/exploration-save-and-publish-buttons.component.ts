@@ -41,12 +41,12 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
   controller: [
     '$scope', '$uibModal', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
-    'ExplorationWarningsService', 'UrlInterpolationService',
+    'ExplorationWarningsService',
     'UserExplorationPermissionsService',
     function(
         $scope, $uibModal, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, UrlInterpolationService,
+        ExplorationWarningsService,
         UserExplorationPermissionsService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -82,7 +82,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
           !$scope.saveIsInProcess) {
           isModalDisplayed = true;
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            template: require(
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-save-prompt-modal.template.html'),
             backdrop: 'static',
