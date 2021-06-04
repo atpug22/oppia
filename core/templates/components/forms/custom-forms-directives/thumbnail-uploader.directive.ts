@@ -50,7 +50,7 @@ angular.module('oppia').directive('thumbnailUploader', [
         updateFilename: '='
       },
       template: require(
-        '/components/forms/custom-forms-directives/' +
+        'components/forms/custom-forms-directives/' +
         'thumbnail-uploader.directive.html'),
       controller: ['$rootScope', '$scope', '$uibModal',
         'AlertsService', 'ContextService', 'CsrfTokenService',
@@ -178,7 +178,7 @@ angular.module('oppia').directive('thumbnailUploader', [
             };
             $uibModal.open({
               template: require(
-                '/components/forms/custom-forms-directives/' +
+                'components/forms/custom-forms-directives/' +
                 'edit-thumbnail-modal.template.html'),
               backdrop: 'static',
               resolve: {

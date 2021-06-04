@@ -45,7 +45,7 @@ angular.module('oppia').directive('responseHeader', function() {
       navigateToState: '='
     },
     template: require(
-      '/components/state-directives/response-header/' +
+      'components/state-directives/response-header/' +
         'response-header.directive.html'),
     controllerAs: '$ctrl',
     controller: [

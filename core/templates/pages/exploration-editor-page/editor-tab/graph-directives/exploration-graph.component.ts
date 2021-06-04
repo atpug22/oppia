@@ -64,7 +64,7 @@ angular.module('oppia').component('explorationGraph', {
 
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/exploration-graph-modal.template.html'),
           backdrop: true,
           resolve: {

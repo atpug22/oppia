@@ -458,7 +458,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
 
         return $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/editor-tab/templates/' +
+            'pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
           resolve: {

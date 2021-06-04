@@ -91,7 +91,7 @@ angular.module('oppia').factory('RteHelperService', [
         $document[0].execCommand('enableObjectResizing', false, false);
         $uibModal.open({
           template: require(
-            '/components/ck-editor-helpers/' +
+            'components/ck-editor-helpers/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {

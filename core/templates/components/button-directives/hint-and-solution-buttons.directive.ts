@@ -41,7 +41,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', function() {
     scope: {},
     bindToController: {},
     template: require(
-      '/components/button-directives/' +
+      'components/button-directives/' +
         'hint-and-solution-buttons.directive.html'),
     controllerAs: '$ctrl',
     controller: [

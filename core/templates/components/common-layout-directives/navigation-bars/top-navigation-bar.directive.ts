@@ -44,7 +44,7 @@ angular.module('oppia').directive('topNavigationBar', [
         backButtonShown: '<'
       },
       template: require(
-        '/components/common-layout-directives/navigation-bars/top-navigation' +
+        'components/common-layout-directives/navigation-bars/top-navigation' +
         '-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [

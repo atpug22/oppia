@@ -83,7 +83,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
           isModalDisplayed = true;
           $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/modal-templates/' +
+              'pages/exploration-editor-page/modal-templates/' +
               'exploration-save-prompt-modal.template.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'

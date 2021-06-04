@@ -40,7 +40,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
       showNonStrictValidationFailModal: function() {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'save-validation-fail-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
@@ -59,7 +59,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
       showVersionMismatchModal: function(lostChanges) {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'save-version-mismatch-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
@@ -79,7 +79,7 @@ angular.module('oppia').factory('AutosaveInfoModalsService', [
       showLostChangesModal: function(lostChanges, explorationId) {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'lost-changes-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',

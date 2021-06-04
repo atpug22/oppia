@@ -53,7 +53,7 @@ angular.module('oppia').directive('stateContentEditor', function() {
       showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
     },
     template: require(
-      '/components/state-editor/state-content-editor/' +
+      'components/state-editor/state-content-editor/' +
         'state-content-editor.directive.html'),
     controller: [
       '$scope', 'ContextService', 'EditabilityService',

@@ -55,7 +55,7 @@ angular.module('oppia').directive('outcomeEditor', function() {
       showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
     },
     template: require(
-      '/components/state-directives/outcome-editor/' +
+      'components/state-directives/outcome-editor/' +
         'outcome-editor.directive.html'),
     controllerAs: '$ctrl',
     controller: [

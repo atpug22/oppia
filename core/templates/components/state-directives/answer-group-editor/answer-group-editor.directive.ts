@@ -73,7 +73,7 @@ angular.module('oppia').directive('answerGroupEditor', function() {
       suppressWarnings: '&'
     },
     template: require(
-      '/components/state-directives/answer-group-editor/' +
+      'components/state-directives/answer-group-editor/' +
         'answer-group-editor.directive.html'),
     controllerAs: '$ctrl',
     controller: [

@@ -440,7 +440,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.showWelcomeExplorationModal = function() {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'welcome-modal.template.html'),
           backdrop: true,
           controller: 'WelcomeModalController',
@@ -489,7 +489,7 @@ angular.module('oppia').component('explorationEditorPage', {
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
               'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',

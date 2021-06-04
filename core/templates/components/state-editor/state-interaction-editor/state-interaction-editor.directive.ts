@@ -259,7 +259,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               template: require(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'

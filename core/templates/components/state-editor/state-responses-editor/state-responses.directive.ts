@@ -109,7 +109,7 @@ angular.module('oppia').directive('stateResponses', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       template: require(
-        '/components/state-editor/state-responses-editor/' +
+        'components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$uibModal', 'AlertsService',
@@ -312,7 +312,7 @@ angular.module('oppia').directive('stateResponses', [
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               template: require(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
@@ -360,7 +360,7 @@ angular.module('oppia').directive('stateResponses', [
             AlertsService.clearWarnings();
             $uibModal.open({
               template: require(
-                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'

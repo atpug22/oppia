@@ -76,7 +76,7 @@ angular.module('oppia').directive('stateSolutionEditor', function() {
       showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
     },
     template: require(
-      '/components/state-editor/state-solution-editor/' +
+      'components/state-editor/state-solution-editor/' +
         'state-solution-editor.directive.html'),
     controller: [
       '$filter', '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
@@ -154,7 +154,7 @@ angular.module('oppia').directive('stateSolutionEditor', function() {
           $scope.inlineSolutionEditorIsActive = false;
           $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/editor-tab/templates/' +
+              'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/add-or-update-solution-modal.template.html'),
             backdrop: 'static',
             controller: 'AddOrUpdateSolutionModalController'
@@ -191,7 +191,7 @@ angular.module('oppia').directive('stateSolutionEditor', function() {
           AlertsService.clearWarnings();
           $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/editor-tab/templates/' +
+              'pages/exploration-editor-page/editor-tab/templates/' +
                 'modal-templates/delete-solution-modal.template.html'),
             backdrop: true,
             controller: 'ConfirmOrCancelModalController'

@@ -31,18 +31,17 @@ require(
 
 require('domain/utilities/url-interpolation.service.ts');
 
-angular.module('oppia').directive('schemaBasedViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        schema: '&',
-        localValue: '='
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }]);
+angular.module('oppia').directive('schemaBasedViewer', function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {
+      schema: '&',
+      localValue: '='
+    },
+    template: require(
+      'components/forms/schema-viewers/schema-based-viewer.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {}]
+  };
+});

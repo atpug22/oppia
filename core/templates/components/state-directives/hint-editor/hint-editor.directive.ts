@@ -41,7 +41,7 @@ angular.module('oppia').directive('hintEditor', function() {
       showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
     },
     template: require(
-      '/components/state-directives/hint-editor/hint-editor.directive.html'),
+      'components/state-directives/hint-editor/hint-editor.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       'ContextService', 'EditabilityService',

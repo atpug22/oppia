@@ -43,7 +43,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         addState: '='
       },
       template: require(
-        '/components/state-directives/outcome-editor/' +
+        'components/state-directives/outcome-editor/' +
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

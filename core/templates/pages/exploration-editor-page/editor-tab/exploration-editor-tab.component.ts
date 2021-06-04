@@ -287,7 +287,7 @@ angular.module('oppia').component('explorationEditorTab', {
         if (shouldPrompt) {
           $uibModal.open({
             template: require(
-              '/components/forms/forms-templates/mark-all-audio-and-' +
+              'components/forms/forms-templates/mark-all-audio-and-' +
               'translations-as-needing-update-modal.directive.html'),
             backdrop: 'static',
             controller: 'ConfirmOrCancelModalController'

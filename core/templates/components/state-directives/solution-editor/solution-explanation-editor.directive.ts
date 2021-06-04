@@ -39,7 +39,7 @@ angular.module('oppia').directive('solutionExplanationEditor',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       template: require(
-        '/components/state-directives/solution-editor/' +
+        'components/state-directives/solution-editor/' +
         'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [

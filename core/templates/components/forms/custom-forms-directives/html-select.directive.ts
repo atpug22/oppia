@@ -32,7 +32,7 @@ angular.module('oppia').directive('htmlSelect', function() {
       selection: '='
     },
     template: require(
-      '/components/forms/custom-forms-directives/html-select.directive.html'),
+      'components/forms/custom-forms-directives/html-select.directive.html'),
     controller: ['$scope', function($scope) {
       $scope.select = function(id) {
         $scope.selection = id;

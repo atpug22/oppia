@@ -122,7 +122,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
     var showCongratulatorySharingModal = function() {
       return $uibModal.open({
         template: require(
-          '/pages/exploration-editor-page/modal-templates/' +
+          'pages/exploration-editor-page/modal-templates/' +
           'post-publish-modal.template.html'),
         backdrop: true,
         controller: 'PostPublishModalController'
@@ -140,7 +140,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
       $uibModal.open({
         template: require(
-          '/pages/exploration-editor-page/modal-templates/' +
+          'pages/exploration-editor-page/modal-templates/' +
           'exploration-publish-modal.template.html'),
         backdrop: 'static',
         controller: 'ConfirmOrCancelModalController'
@@ -242,7 +242,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
       discardChanges: function() {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'confirm-discard-changes-modal.template.html'),
           backdrop: 'static',
           keyboard: false,
@@ -253,7 +253,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/modal-templates/' +
+              'pages/exploration-editor-page/modal-templates/' +
               'editor-reloading-modal.template.html'),
             backdrop: 'static',
             keyboard: false,
@@ -296,7 +296,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
         if (isAdditionalMetadataNeeded()) {
           var modalInstance = $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/modal-templates/' +
+              'pages/exploration-editor-page/modal-templates/' +
               'exploration-metadata-modal.template.html'),
             backdrop: 'static',
             controller: 'ExplorationMetadataModalController'
@@ -404,7 +404,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           var modalInstance = $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/modal-templates/' +
+              'pages/exploration-editor-page/modal-templates/' +
               'exploration-save-modal.template.html'),
             backdrop: 'static',
             resolve: {

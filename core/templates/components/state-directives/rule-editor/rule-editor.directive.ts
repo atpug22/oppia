@@ -60,7 +60,7 @@ angular.module('oppia').directive('ruleEditor', [
         modalId: '<'
       },
       template: require(
-        '/components/state-directives/rule-editor/rule-editor.directive.html'),
+        'components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'EventBusService',

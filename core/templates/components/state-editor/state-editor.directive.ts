@@ -96,8 +96,8 @@ angular.module('oppia').directive('stateEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         explorationIsLinkedToStory: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-editor.directive.html'),
+      template: require(
+        'components/state-editor/state-editor.directive.html'),
       controller: [
         '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',

@@ -114,7 +114,7 @@ angular.module('oppia').component('previewTab', {
       ctrl.showSetParamsModal = function(manualParamChanges, callback) {
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/preview-tab/templates/' +
+            'pages/exploration-editor-page/preview-tab/templates/' +
             'preview-set-parameters-modal.template.html'),
           backdrop: 'static',
           windowClass: 'oppia-preview-set-params-modal',

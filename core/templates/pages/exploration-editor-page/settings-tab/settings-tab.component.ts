@@ -149,7 +149,7 @@ angular.module('oppia').component('settingsTab', {
 
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'reassign-role-confirmation-modal.directive.html'),
           backdrop: true,
           resolve: {
@@ -320,7 +320,7 @@ angular.module('oppia').component('settingsTab', {
 
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'remove-role-confirmation-modal.directive.html'),
           backdrop: true,
           resolve: {
@@ -378,7 +378,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'preview-summary-tile-modal.template.html'),
           backdrop: true,
           controller: 'PreviewSummaryTileModalController'
@@ -391,7 +391,7 @@ angular.module('oppia').component('settingsTab', {
         AlertsService.clearWarnings();
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'transfer-exploration-ownership-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
@@ -407,7 +407,7 @@ angular.module('oppia').component('settingsTab', {
 
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/settings-tab/templates/' +
+            'pages/exploration-editor-page/settings-tab/templates/' +
             'delete-exploration-modal.template.html'),
           backdrop: true,
           controller: 'ConfirmOrCancelModalController'
@@ -433,7 +433,7 @@ angular.module('oppia').component('settingsTab', {
 
           $uibModal.open({
             template: require(
-              '/pages/exploration-editor-page/settings-tab/templates/' +
+              'pages/exploration-editor-page/settings-tab/templates/' +
               'moderator-unpublish-exploration-modal.template.html'),
             backdrop: true,
             resolve: {

@@ -69,7 +69,7 @@ angular.module('oppia').component('editorNavigation', {
         var TRANSLATION_TUTORIAL_MODE = 'translation';
         $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/modal-templates/' +
+            'pages/exploration-editor-page/modal-templates/' +
             'help-modal.template.html'),
           backdrop: true,
           controller: 'HelpModalController',

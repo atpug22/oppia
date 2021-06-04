@@ -45,7 +45,7 @@ angular.module('oppia').directive('select2Dropdown', function() {
       width: '@'
     },
     template: require(
-      '/components/forms/custom-forms-directives/' +
+      'components/forms/custom-forms-directives/' +
         'select2-dropdown.directive.html'),
     controller: ['$element', '$scope', function($element, $scope) {
       var ctrl = this;

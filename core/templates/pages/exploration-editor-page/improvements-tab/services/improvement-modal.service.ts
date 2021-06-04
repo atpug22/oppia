@@ -48,7 +48,7 @@ angular.module('oppia').factory('ImprovementModalService', [
       openLearnerAnswerDetails: function(learnerAnswerDetails) {
         return $uibModal.open({
           template: require(
-            '/pages/exploration-editor-page/improvements-tab/templates/' +
+            'pages/exploration-editor-page/improvements-tab/templates/' +
             'answer-details-modal.template.html'),
           resolve: {
             isEditable: () => (
@@ -66,7 +66,7 @@ angular.module('oppia').factory('ImprovementModalService', [
       openConfirmationModal: function(message, buttonText, buttonClass) {
         return $uibModal.open({
           template: require(
-            '/components/common-layout-directives/common-elements/' +
+            'components/common-layout-directives/common-elements/' +
             'confirmation-modal.template.html'),
           backdrop: true,
           resolve: {
