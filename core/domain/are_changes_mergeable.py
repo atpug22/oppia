@@ -1,16 +1,29 @@
 def are_changes_mergeable(exp_id, version, change_list):
     """
-    version: version of an exploration from frontend on which a user is working.
-    latest_version: latest version of an exploration in the backend.
-    complete_change_list: complete list of the changes in an exploration from the
-                            backend between version and latest version.
-    added_states_name: list of new states added in a complete change list.
-    deleted_states_name: list of deleted states in a complete change list.
-    old_to_new_state_names: stores the changes in the state names in the complete_change_list.
-    old_version: copy of the frontend version of an exploration.
-    new_version: copy of the latest backend version of an exploration.
-    changed_properties: list of all the properties changed according to the state and property name.
+    Args:
+        exp_id: id of the exploration in which changes are being made.
+        version: version of an exploration from frontend on which a user is working.
+        change_list: list of the changes made by the user on the frontend, which
+            needs to be checked for mergeability.
 
+    Attributes:
+        latest_version: latest version of an exploration in the backend.
+        complete_change_list: complete list of the changes in an exploration from the
+            backend between version and latest version.
+        added_states_name: list of new states added in a complete change list.
+        deleted_states_name: list of deleted states in a complete change list.
+        old_to_new_state_names: stores the changes in the state names in the
+            complete_change_list.
+        old_version: copy of the frontend version of an exploration.
+        new_version: copy of the latest backend version of an exploration.
+        changed_properties: list of all the properties changed according to
+            the state and property name.
+        state_names_of_renamed_states: stores the changes in the state names
+            in change_list.
+
+    Returns:
+        boolean. A boolean value True if the changes are mergeable and False if
+            the changes are not mergeable.
     """
 
     latest_version = exp_fetchers.get_exploration_by_id(exp_id).version
@@ -26,6 +39,7 @@ def are_changes_mergeable(exp_id, version, change_list):
 
         old_version = exp_fetchers.get_exploration_by_id(exp_id, version)
         new_version = exp_fetchers.get_exploration_by_id(exp_id, latest_version)
+
         if added_state_names.length > 0 or deleted_state_names.length > 0:
             """
             Here we will send the changelist, version, latest_version,
@@ -46,7 +60,7 @@ def are_changes_mergeable(exp_id, version, change_list):
             }
         } """
 
-        new_state_renamed = {}
+        state_names_of_renamed_states = {}
         for change in change_list:
             is_change_mergeable = False
             if change.cmd == exp_domain.CMD_RENAME_STATE:
