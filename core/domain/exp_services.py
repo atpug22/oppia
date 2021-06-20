@@ -339,7 +339,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
 
 
 # Repository SAVE and DELETE methods.
-def apply_change_list(exploration_id, change_list):
+def apply_change_list(exploration_id, change_list, frontend_version):
     """Applies a changelist to a pristine exploration and returns the result.
 
     Each entry in change_list is a dict that represents an ExplorationChange
@@ -357,206 +357,689 @@ def apply_change_list(exploration_id, change_list):
     Raises:
         Exception. Any entries in the changelist are invalid.
     """
-    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    try:
-        to_param_domain = param_domain.ParamChange.from_dict
-        for change in change_list:
-            if change.cmd == exp_domain.CMD_ADD_STATE:
-                exploration.add_states([change.state_name])
-            elif change.cmd == exp_domain.CMD_RENAME_STATE:
-                exploration.rename_state(
-                    change.old_state_name, change.new_state_name)
-            elif change.cmd == exp_domain.CMD_DELETE_STATE:
-                exploration.delete_state(change.state_name)
-            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
-                state = exploration.states[change.state_name]
-                if (change.property_name ==
-                        exp_domain.STATE_PROPERTY_PARAM_CHANGES):
-                    state.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
-                elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
-                    content = (
-                        state_domain.SubtitledHtml.from_dict(change.new_value))
-                    content.validate()
-                    state.update_content(content)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                    state.update_interaction_id(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
-                    state.update_next_content_id_index(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                    state.update_linked_skill_id(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    state.update_interaction_customization_args(
-                        change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
-                    raise utils.InvalidInputException(
-                        'Editing interaction handlers is no longer supported')
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    new_answer_groups = [
-                        state_domain.AnswerGroup.from_dict(answer_groups)
-                        for answer_groups in change.new_value
-                    ]
-                    state.update_interaction_answer_groups(new_answer_groups)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                    new_outcome = None
-                    if change.new_value:
-                        new_outcome = state_domain.Outcome.from_dict(
-                            change.new_value
-                        )
-                    state.update_interaction_default_outcome(new_outcome)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                    state.update_interaction_confirmed_unclassified_answers(
-                        change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
-                    if not isinstance(change.new_value, list):
-                        raise Exception(
-                            'Expected hints_list to be a list,'
-                            ' received %s' % change.new_value)
-                    new_hints_list = [
-                        state_domain.Hint.from_dict(hint_dict)
-                        for hint_dict in change.new_value
-                    ]
-                    state.update_interaction_hints(new_hints_list)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    new_solution = None
-                    if change.new_value is not None:
-                        new_solution = state_domain.Solution.from_dict(
-                            state.interaction.id, change.new_value)
-                    state.update_interaction_solution(new_solution)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
-                    if not isinstance(change.new_value, bool):
-                        raise Exception(
-                            'Expected solicit_answer_details to be a ' +
-                            'bool, received %s' % change.new_value)
-                    state.update_solicit_answer_details(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
-                    if not isinstance(change.new_value, bool):
-                        raise Exception(
-                            'Expected card_is_checkpoint to be a ' +
-                            'bool, received %s' % change.new_value)
-                    state.update_card_is_checkpoint(change.new_value)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected recorded_voiceovers to be a dict, '
-                            'received %s' % change.new_value)
-                    # Explicitly convert the duration_secs value from
-                    # int to float. Reason for this is the data from
-                    # the frontend will be able to match the backend
-                    # state model for Voiceover properly. Also js
-                    # treats any number that can be float and int as
-                    # int (no explicit types). For example,
-                    # 10.000 is not 10.000 it is 10.
-                    new_voiceovers_mapping = (
-                        change.new_value['voiceovers_mapping'])
-                    language_codes_to_audio_metadata = (
-                        new_voiceovers_mapping.values())
-                    for language_codes in language_codes_to_audio_metadata:
-                        for audio_metadata in language_codes.values():
-                            audio_metadata['duration_secs'] = (
-                                float(audio_metadata['duration_secs'])
-                            )
-                    recorded_voiceovers = (
-                        state_domain.RecordedVoiceovers.from_dict(
-                            change.new_value))
-                    state.update_recorded_voiceovers(recorded_voiceovers)
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected written_translations to be a dict, '
-                            'received %s' % change.new_value)
-                    cleaned_written_translations_dict = (
-                        state_domain.WrittenTranslations
-                        .convert_html_in_written_translations(
-                            change.new_value, html_cleaner.clean))
-                    written_translations = (
-                        state_domain.WrittenTranslations.from_dict(
-                            cleaned_written_translations_dict))
-                    state.update_written_translations(written_translations)
-            elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
-                # DEPRECATED: This command is deprecated. Please do not use.
-                # The command remains here to support old suggestions.
-                exploration.states[change.state_name].add_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html)
-            elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[change.state_name].add_written_translation(
-                    change.content_id, change.language_code,
-                    change.translation_html, change.data_format)
-            elif (change.cmd ==
-                  exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
-                exploration.states[
-                    change.state_name
-                ].mark_written_translations_as_needing_update(change.content_id)
-            elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
-                if change.property_name == 'title':
-                    exploration.update_title(change.new_value)
-                elif change.property_name == 'category':
-                    exploration.update_category(change.new_value)
-                elif change.property_name == 'objective':
-                    exploration.update_objective(change.new_value)
-                elif change.property_name == 'language_code':
-                    exploration.update_language_code(change.new_value)
-                elif change.property_name == 'tags':
-                    exploration.update_tags(change.new_value)
-                elif change.property_name == 'blurb':
-                    exploration.update_blurb(change.new_value)
-                elif change.property_name == 'author_notes':
-                    exploration.update_author_notes(change.new_value)
-                elif change.property_name == 'param_specs':
-                    exploration.update_param_specs(change.new_value)
-                elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(list(
-                        python_utils.MAP(to_param_domain, change.new_value)))
-                elif change.property_name == 'init_state_name':
-                    exploration.update_init_state_name(change.new_value)
-                elif change.property_name == 'auto_tts_enabled':
-                    exploration.update_auto_tts_enabled(change.new_value)
-                elif change.property_name == 'correctness_feedback_enabled':
-                    exploration.update_correctness_feedback_enabled(
-                        change.new_value)
-            elif (change.cmd ==
-                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-                # Loading the exploration model from the datastore into an
-                # Exploration domain object automatically converts it to use
-                # the latest states schema version. As a result, simply
-                # resaving the exploration is sufficient to apply the states
-                # schema update. Thus, no action is needed here other than
-                # to make sure that the version that the user is trying to
-                # migrate to is the latest version.
-                target_version_is_current_state_schema_version = (
-                    change.to_version ==
-                    python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
-                if not target_version_is_current_state_schema_version:
-                    raise Exception(
-                        'Expected to migrate to the latest state schema '
-                        'version %s, received %s' % (
-                            feconf.CURRENT_STATE_SCHEMA_VERSION,
-                            change.to_version))
-        return exploration
 
-    except Exception as e:
-        logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, exploration_id,
-                pprint.pprint(change_list))
-        )
-        python_utils.reraise_exception()
+    backend_version = exp_fetchers.get_exploration_by_id(exploration_id).version
+    if (backend_version == frontend_version or
+            frontend_version is None):
+        exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+        try:
+            to_param_domain = param_domain.ParamChange.from_dict
+            for change in change_list:
+                if change.cmd == exp_domain.CMD_ADD_STATE:
+                    exploration.add_states([change.state_name])
+                elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                    exploration.rename_state(
+                        change.old_state_name, change.new_state_name)
+                elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                    exploration.delete_state(change.state_name)
+                elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                    state = exploration.states[change.state_name]
+                    if (change.property_name ==
+                            exp_domain.STATE_PROPERTY_PARAM_CHANGES):
+                        state.update_param_changes(
+                            list(python_utils.MAP(
+                                to_param_domain, change.new_value)))
+                    elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                        content = (
+                            state_domain.SubtitledHtml.from_dict(change.new_value))
+                        content.validate()
+                        state.update_content(content)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                        state.update_interaction_id(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                        state.update_next_content_id_index(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
+                        state.update_linked_skill_id(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                        state.update_interaction_customization_args(
+                            change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                        raise utils.InvalidInputException(
+                            'Editing interaction handlers is no longer supported')
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                        new_answer_groups = [
+                            state_domain.AnswerGroup.from_dict(answer_groups)
+                            for answer_groups in change.new_value
+                        ]
+                        state.update_interaction_answer_groups(new_answer_groups)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                        new_outcome = None
+                        if change.new_value:
+                            new_outcome = state_domain.Outcome.from_dict(
+                                change.new_value
+                            )
+                        state.update_interaction_default_outcome(new_outcome)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
+                        state.update_interaction_confirmed_unclassified_answers(
+                            change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                        if not isinstance(change.new_value, list):
+                            raise Exception(
+                                'Expected hints_list to be a list,'
+                                ' received %s' % change.new_value)
+                        new_hints_list = [
+                            state_domain.Hint.from_dict(hint_dict)
+                            for hint_dict in change.new_value
+                        ]
+                        state.update_interaction_hints(new_hints_list)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                        new_solution = None
+                        if change.new_value is not None:
+                            new_solution = state_domain.Solution.from_dict(
+                                state.interaction.id, change.new_value)
+                        state.update_interaction_solution(new_solution)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                        if not isinstance(change.new_value, bool):
+                            raise Exception(
+                                'Expected solicit_answer_details to be a ' +
+                                'bool, received %s' % change.new_value)
+                        state.update_solicit_answer_details(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT):
+                        if not isinstance(change.new_value, bool):
+                            raise Exception(
+                                'Expected card_is_checkpoint to be a ' +
+                                'bool, received %s' % change.new_value)
+                        state.update_card_is_checkpoint(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                        if not isinstance(change.new_value, dict):
+                            raise Exception(
+                                'Expected recorded_voiceovers to be a dict, '
+                                'received %s' % change.new_value)
+                        # Explicitly convert the duration_secs value from
+                        # int to float. Reason for this is the data from
+                        # the frontend will be able to match the backend
+                        # state model for Voiceover properly. Also js
+                        # treats any number that can be float and int as
+                        # int (no explicit types). For example,
+                        # 10.000 is not 10.000 it is 10.
+                        new_voiceovers_mapping = (
+                            change.new_value['voiceovers_mapping'])
+                        language_codes_to_audio_metadata = (
+                            new_voiceovers_mapping.values())
+                        for language_codes in language_codes_to_audio_metadata:
+                            for audio_metadata in language_codes.values():
+                                audio_metadata['duration_secs'] = (
+                                    float(audio_metadata['duration_secs'])
+                                )
+                        recorded_voiceovers = (
+                            state_domain.RecordedVoiceovers.from_dict(
+                                change.new_value))
+                        state.update_recorded_voiceovers(recorded_voiceovers)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                        if not isinstance(change.new_value, dict):
+                            raise Exception(
+                                'Expected written_translations to be a dict, '
+                                'received %s' % change.new_value)
+                        cleaned_written_translations_dict = (
+                            state_domain.WrittenTranslations
+                            .convert_html_in_written_translations(
+                                change.new_value, html_cleaner.clean))
+                        written_translations = (
+                            state_domain.WrittenTranslations.from_dict(
+                                cleaned_written_translations_dict))
+                        state.update_written_translations(written_translations)
+                elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
+                    # DEPRECATED: This command is deprecated. Please do not use.
+                    # The command remains here to support old suggestions.
+                    exploration.states[change.state_name].add_translation(
+                        change.content_id, change.language_code,
+                        change.translation_html)
+                elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
+                    exploration.states[change.state_name].add_written_translation(
+                        change.content_id, change.language_code,
+                        change.translation_html, change.data_format)
+                elif (change.cmd ==
+                    exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
+                    exploration.states[
+                        change.state_name
+                    ].mark_written_translations_as_needing_update(change.content_id)
+                elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                    if change.property_name == 'title':
+                        exploration.update_title(change.new_value)
+                    elif change.property_name == 'category':
+                        exploration.update_category(change.new_value)
+                    elif change.property_name == 'objective':
+                        exploration.update_objective(change.new_value)
+                    elif change.property_name == 'language_code':
+                        exploration.update_language_code(change.new_value)
+                    elif change.property_name == 'tags':
+                        exploration.update_tags(change.new_value)
+                    elif change.property_name == 'blurb':
+                        exploration.update_blurb(change.new_value)
+                    elif change.property_name == 'author_notes':
+                        exploration.update_author_notes(change.new_value)
+                    elif change.property_name == 'param_specs':
+                        exploration.update_param_specs(change.new_value)
+                    elif change.property_name == 'param_changes':
+                        exploration.update_param_changes(list(
+                            python_utils.MAP(to_param_domain, change.new_value)))
+                    elif change.property_name == 'init_state_name':
+                        exploration.update_init_state_name(change.new_value)
+                    elif change.property_name == 'auto_tts_enabled':
+                        exploration.update_auto_tts_enabled(change.new_value)
+                    elif change.property_name == 'correctness_feedback_enabled':
+                        exploration.update_correctness_feedback_enabled(
+                            change.new_value)
+                elif (change.cmd ==
+                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+                    # Loading the exploration model from the datastore into an
+                    # Exploration domain object automatically converts it to use
+                    # the latest states schema version. As a result, simply
+                    # resaving the exploration is sufficient to apply the states
+                    # schema update. Thus, no action is needed here other than
+                    # to make sure that the version that the user is trying to
+                    # migrate to is the latest version.
+                    target_version_is_current_state_schema_version = (
+                        change.to_version ==
+                        python_utils.UNICODE(feconf.CURRENT_STATE_SCHEMA_VERSION))
+                    if not target_version_is_current_state_schema_version:
+                        raise Exception(
+                            'Expected to migrate to the latest state schema '
+                            'version %s, received %s' % (
+                                feconf.CURRENT_STATE_SCHEMA_VERSION,
+                                change.to_version))
+            return exploration
+
+        except Exception as e:
+            logging.error(
+                '%s %s %s %s' % (
+                    e.__class__.__name__, e, exploration_id,
+                    pprint.pprint(change_list))
+            )
+            python_utils.reraise_exception()
+    else:
+        # A complete list of changes from one version to another
+        # is composite_change_list.
+        composite_change_list = get_composite_change_list(
+            exploration_id, frontend_version, backend_version)
+
+        # Added_state_names: list(str). Names of the states added to the
+        # exploration from prev_exp_version to current_exp_version. It stores
+        # the latest name of the added state.
+        added_state_names = []
+
+        # Deleted_state_names: list(str). Names of the states deleted from the
+        # exploration from prev_exp_version to current_exp_version. It stores
+        # the initial name of the deleted state from pre_exp_version.
+        deleted_state_names = []
+
+        # New_to_old_state_names: dict. Dictionary mapping state names of
+        # current_exp_version to the state names of prev_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        new_to_old_state_names = {}
+
+        # Changed_properties: dict. List of all the properties changed
+        # according to the state and property name.
+        changed_properties = {}
+
+        frontend_version_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=frontend_version)
+        backend_version_exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, version=backend_version)
+        for change in composite_change_list:
+            if change.cmd == exp_domain.CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == exp_domain.CMD_DELETE_STATE:
+                state_name = change.state_name
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
+                else:
+                    original_state_name = state_name
+                    if original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
+            elif change.cmd == exp_domain.CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
+                else:
+                    new_to_old_state_names[new_state_name] = old_state_name
+
+            # A condition to store the name of the properties changed
+            # in changed_properties dict.
+            elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                state_name = change.state_name
+                if state_name in new_to_old_state_names:
+                    state_name = new_to_old_state_names[change.state_name]
+                if state_name in changed_properties:
+                    if (change.property_name not in
+                            changed_properties[state_name]):
+                        changed_properties[state_name].append(
+                            change.property_name)
+                else:
+                    changed_properties[state_name] = [change.property_name]
+
+        # Old_to_new_state_names: dict. Dictionary mapping state names of
+        # prev_exp_version to the state names of current_exp_version.
+        # It doesn't include the name changes of added/deleted states.
+        old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.items()
+        }
+
+        if len(added_state_names) > 0 or len(deleted_state_names) > 0:
+            # Here we will send the changelist, version, latest_version,
+            # and exploration to the admin, so that the conditions
+            # can we reviewed.
+            return False
+
+        changes_are_mergeable = False
+
+        # state_names_of_renamed_states: Stores the changes in states names
+        # in change_list.
+        try:
+            exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+            state_names_of_renamed_states = {}
+            for change in change_list:
+                change_is_mergeable = False
+                if change.cmd == exp_domain.CMD_RENAME_STATE:
+                    old_state_name = change.old_state_name
+                    new_state_name = change.new_state_name
+                    if old_state_name in state_names_of_renamed_states:
+                        state_names_of_renamed_states[new_state_name] = (
+                            state_names_of_renamed_states.pop(old_state_name))
+                    else:
+                        state_names_of_renamed_states[new_state_name] = (
+                            old_state_name)
+                    if (state_names_of_renamed_states[new_state_name] not in
+                            old_to_new_state_names):
+                        change_is_mergeable = True
+                elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                    old_state_name = change.state_name
+                    new_state_name = change.state_name
+                    if change.state_name in state_names_of_renamed_states:
+                        old_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                        new_state_name = (
+                            state_names_of_renamed_states[change.state_name])
+                    if change.state_name in old_to_new_state_names:
+                        new_state_name = old_to_new_state_names[old_state_name]
+                    state = exploration.states[new_state_name]
+                    if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
+                        if (frontend_version_exploration.states[old_state_name].content.html == # pylint: disable=line-too-long
+                                backend_version_exploration.states[new_state_name].content.html): # pylint: disable=line-too-long
+                            content = (
+                                state_domain.SubtitledHtml.from_dict(change.new_value))
+                            content.validate()
+                            state.update_content(content)
+                            change_is_mergeable = True
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                        if old_state_name in changed_properties:
+                            if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
+                                if ('widget_customization_args' not in
+                                        changed_properties[old_state_name] and
+                                        'answer_group' not in
+                                        changed_properties[old_state_name] and
+                                        'solution' not in
+                                        changed_properties[old_state_name]):
+                                    change_is_mergeable = True
+                                    state.update_interaction_id(change.new_value)
+                        else:
+                            change_is_mergeable = True
+                            state.update_interaction_id(change.new_value)
+                    # Customization args differ for every interaction, so in case of
+                    # different interactions merging is simply not possible,
+                    # but in case of same interaction, the values in the
+                    # customization_args are often lists so if someone changes
+                    # even one item of that list then determining which item is
+                    # changed is not feasible, so suppose there is long list of
+                    # values in item selection interaction and one user deletes
+                    # one value and another one edits another value, so after
+                    # deletion the indices of all the values will be changed and
+                    # it will not be possible to compare and know that which value
+                    # is changed by second user.
+                    # So we will not be handling the merge on the basis of
+                    # individual fields.
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                        if old_state_name in changed_properties:
+                            if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
+                                if (change.property_name not in
+                                        changed_properties[old_state_name] and
+                                        'answer_group' not in
+                                        changed_properties[old_state_name] and
+                                        'solution' not in
+                                        changed_properties[old_state_name]):
+                                    change_is_mergeable = True
+                                    state.update_interaction_customization_args(
+                                        change.new_value)
+                        else:
+                            change_is_mergeable = True
+                            state.update_interaction_customization_args(
+                                change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                        if old_state_name in changed_properties:
+                            if (frontend_version_exploration.states[old_state_name].interaction.id ==  # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
+                                if ('widget_customization_args' not in
+                                        changed_properties[old_state_name] and
+                                        change.property_name not in
+                                        changed_properties[old_state_name] and
+                                        'solution' not in
+                                        changed_properties[old_state_name]):
+                                    change_is_mergeable = True
+                                    new_answer_groups = [
+                                        state_domain.AnswerGroup.from_dict(answer_groups)
+                                        for answer_groups in change.new_value
+                                    ]
+                                    state.update_interaction_answer_groups(new_answer_groups)
+                        else:
+                            change_is_mergeable = True
+                            new_answer_groups = [
+                                state_domain.AnswerGroup.from_dict(answer_groups)
+                                for answer_groups in change.new_value
+                            ]
+                            state.update_interaction_answer_groups(new_answer_groups)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
+                        if old_state_name in changed_properties:
+                            if (change.property_name not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                                new_outcome = None
+                                if change.new_value:
+                                    new_outcome = state_domain.Outcome.from_dict(
+                                        change.new_value
+                                    )
+                                state.update_interaction_default_outcome(new_outcome)
+                        else:
+                            change_is_mergeable = True
+                            new_outcome = None
+                            if change.new_value:
+                                new_outcome = state_domain.Outcome.from_dict(
+                                    change.new_value
+                                )
+                            state.update_interaction_default_outcome(new_outcome)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
+                        change_is_mergeable = True
+                        next_content_id_index = max(change.new_value, state.next_content_id_index)
+                        state.update_next_content_id_index(next_content_id_index)
+                    # We’ll not be able to handle the merge if changelists affect
+                    # the different indices of the hint in the same state because
+                    # whenever there is even a small change in one field of any
+                    # hint, they treat the whole hints list as a new value.
+                    # So it will not be possible to find out the exact change.
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
+                        if old_state_name in changed_properties:
+                            if (change.property_name not in
+                                    changed_properties[old_state_name]):
+                                change_is_mergeable = True
+                                if not isinstance(change.new_value, list):
+                                    raise Exception(
+                                        'Expected hints_list to be a list,'
+                                        ' received %s' % change.new_value)
+                                new_hints_list = [
+                                    state_domain.Hint.from_dict(hint_dict)
+                                    for hint_dict in change.new_value
+                                ]
+                                state.update_interaction_hints(new_hints_list)
+                        else:
+                            change_is_mergeable = True
+                            if not isinstance(change.new_value, list):
+                                raise Exception(
+                                    'Expected hints_list to be a list,'
+                                    ' received %s' % change.new_value)
+                            new_hints_list = [
+                                state_domain.Hint.from_dict(hint_dict)
+                                for hint_dict in change.new_value
+                            ]
+                            state.update_interaction_hints(new_hints_list)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
+                        if old_state_name in changed_properties:
+                            if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].interaction.id): # pylint: disable=line-too-long
+                                if ('widget_customization_args' not in
+                                        changed_properties[old_state_name] and
+                                        'answer_group' not in
+                                        changed_properties[old_state_name]):
+                                    old_solution = (
+                                        frontend_version_exploration.states[old_state_name].interaction.solution) # pylint: disable=line-too-long
+                                    latest_solution = (
+                                        backend_version_exploration.states[new_state_name].interaction.solution) # pylint: disable=line-too-long
+                                    if (old_solution and latest_solution):
+                                        if (old_solution.answer_is_exclusive ==
+                                                latest_solution.answer_is_exclusive and
+                                                old_solution.correct_answer ==
+                                                latest_solution.correct_answer and
+                                                old_solution.explanation.html ==
+                                                latest_solution.explanation.html):
+                                            change_is_mergeable = True
+                                            new_solution = None
+                                            if change.new_value is not None:
+                                                new_solution = state_domain.Solution.from_dict(
+                                                    state.interaction.id, change.new_value)
+                                            state.update_interaction_solution(new_solution)
+                                    if old_solution is None and latest_solution is None:
+                                        change_is_mergeable = True
+                                        new_solution = None
+                                        if change.new_value is not None:
+                                            new_solution = state_domain.Solution.from_dict(
+                                                state.interaction.id, change.new_value)
+                                        state.update_interaction_solution(new_solution)
+                        else:
+                            change_is_mergeable = True
+                            new_solution = None
+                            if change.new_value is not None:
+                                new_solution = state_domain.Solution.from_dict(
+                                    state.interaction.id, change.new_value)
+                            state.update_interaction_solution(new_solution)
+
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                        if old_state_name in changed_properties:
+                            if (frontend_version_exploration.states[old_state_name].interaction.id == # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].interaction.id and # pylint: disable=line-too-long
+                                    frontend_version_exploration.states[old_state_name].solicit_answer_details == # pylint: disable=line-too-long
+                                    backend_version_exploration.states[new_state_name].solicit_answer_details): # pylint: disable=line-too-long
+                                change_is_mergeable = True
+                                if not isinstance(change.new_value, bool):
+                                    raise Exception(
+                                        'Expected solicit_answer_details to be a ' +
+                                        'bool, received %s' % change.new_value)
+                                state.update_solicit_answer_details(change.new_value)
+                        else:
+                            change_is_mergeable = True
+                            if not isinstance(change.new_value, bool):
+                                raise Exception(
+                                    'Expected solicit_answer_details to be a ' +
+                                    'bool, received %s' % change.new_value)
+                            state.update_solicit_answer_details(change.new_value)
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                        if old_state_name in changed_properties:
+                            if all(property not in
+                                changed_properties[old_state_name]
+                                for property in ['content', 'solution',
+                                                    'hints', 'written_translations',
+                                                    'default_outcome',
+                                                    'customization_args',
+                                                    'recorded_voiceovers']):
+                                change_is_mergeable = True
+                                if not isinstance(change.new_value, dict):
+                                    raise Exception(
+                                        'Expected recorded_voiceovers to be a dict, '
+                                        'received %s' % change.new_value)
+                                # Explicitly convert the duration_secs value from
+                                # int to float. Reason for this is the data from
+                                # the frontend will be able to match the backend
+                                # state model for Voiceover properly. Also js
+                                # treats any number that can be float and int as
+                                # int (no explicit types). For example,
+                                # 10.000 is not 10.000 it is 10.
+                                new_voiceovers_mapping = (
+                                    change.new_value['voiceovers_mapping'])
+                                language_codes_to_audio_metadata = (
+                                    new_voiceovers_mapping.values())
+                                for language_codes in language_codes_to_audio_metadata:
+                                    for audio_metadata in language_codes.values():
+                                        audio_metadata['duration_secs'] = (
+                                            float(audio_metadata['duration_secs'])
+                                        )
+                                recorded_voiceovers = (
+                                    state_domain.RecordedVoiceovers.from_dict(
+                                        change.new_value))
+                                state.update_recorded_voiceovers(recorded_voiceovers)
+                        else:
+                            change_is_mergeable = True
+                            if not isinstance(change.new_value, dict):
+                                raise Exception(
+                                    'Expected recorded_voiceovers to be a dict, '
+                                    'received %s' % change.new_value)
+                            # Explicitly convert the duration_secs value from
+                            # int to float. Reason for this is the data from
+                            # the frontend will be able to match the backend
+                            # state model for Voiceover properly. Also js
+                            # treats any number that can be float and int as
+                            # int (no explicit types). For example,
+                            # 10.000 is not 10.000 it is 10.
+                            new_voiceovers_mapping = (
+                                change.new_value['voiceovers_mapping'])
+                            language_codes_to_audio_metadata = (
+                                new_voiceovers_mapping.values())
+                            for language_codes in language_codes_to_audio_metadata:
+                                for audio_metadata in language_codes.values():
+                                    audio_metadata['duration_secs'] = (
+                                        float(audio_metadata['duration_secs'])
+                                    )
+                            recorded_voiceovers = (
+                                state_domain.RecordedVoiceovers.from_dict(
+                                    change.new_value))
+                            state.update_recorded_voiceovers(recorded_voiceovers)
+
+                    elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
+                        if old_state_name in changed_properties:
+                            if all(property not in
+                                changed_properties[old_state_name]
+                                for property in ['content', 'solution',
+                                                    'hints',
+                                                    'written_translations',
+                                                    'default_outcome',
+                                                    'customization_args']):
+                                change_is_mergeable = True
+                                if not isinstance(change.new_value, dict):
+                                    raise Exception(
+                                        'Expected written_translations to be a dict, '
+                                        'received %s' % change.new_value)
+                                cleaned_written_translations_dict = (
+                                    state_domain.WrittenTranslations
+                                    .convert_html_in_written_translations(
+                                        change.new_value, html_cleaner.clean))
+                                written_translations = (
+                                    state_domain.WrittenTranslations.from_dict(
+                                        cleaned_written_translations_dict))
+                                state.update_written_translations(written_translations)
+                        else:
+                            change_is_mergeable = True
+                            if not isinstance(change.new_value, dict):
+                                raise Exception(
+                                    'Expected written_translations to be a dict, '
+                                    'received %s' % change.new_value)
+                            cleaned_written_translations_dict = (
+                                state_domain.WrittenTranslations
+                                .convert_html_in_written_translations(
+                                    change.new_value, html_cleaner.clean))
+                            written_translations = (
+                                state_domain.WrittenTranslations.from_dict(
+                                    cleaned_written_translations_dict))
+                            state.update_written_translations(written_translations)
+
+                elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
+                    if change.property_name == 'title':
+                        if (frontend_version_exploration.title ==
+                                backend_version_exploration.title):
+                            change_is_mergeable = True
+                            exploration.update_title(change.new_value)
+                    elif change.property_name == 'category':
+                        if (frontend_version_exploration.category ==
+                                backend_version_exploration.category):
+                            change_is_mergeable = True
+                            exploration.update_category(change.new_value)
+                    elif change.property_name == 'objective':
+                        if (frontend_version_exploration.objective ==
+                                backend_version_exploration.objective):
+                            change_is_mergeable = True
+                            exploration.update_objective(change.new_value)
+                    elif change.property_name == 'language_code':
+                        if (frontend_version_exploration.language_code ==
+                                backend_version_exploration.language_code):
+                            change_is_mergeable = True
+                            exploration.update_language_code(change.new_value)
+                    elif change.property_name == 'tags':
+                        if (frontend_version_exploration.tags ==
+                                backend_version_exploration.tags):
+                            change_is_mergeable = True
+                            exploration.update_tags(change.new_value)
+                    elif change.property_name == 'blurb':
+                        if (frontend_version_exploration.blurb ==
+                                backend_version_exploration.blurb):
+                            change_is_mergeable = True
+                            exploration.update_blurb(change.new_value)
+                    elif change.property_name == 'author_notes':
+                        if (frontend_version_exploration.author_notes ==
+                                backend_version_exploration.author_notes):
+                            change_is_mergeable = True
+                            exploration.update_author_notes(change.new_value)
+                    elif change.property_name == 'init_state_name':
+                        if (frontend_version_exploration.init_state_name ==
+                                backend_version_exploration.init_state_name):
+                            change_is_mergeable = True
+                            exploration.update_init_state_name(change.new_value)
+                    elif change.property_name == 'auto_tts_enabled':
+                        if (frontend_version_exploration.auto_tts_enabled ==
+                                backend_version_exploration.auto_tts_enabled):
+                            change_is_mergeable = True
+                            exploration.update_auto_tts_enabled(change.new_value)
+                    elif change.property_name == 'correctness_feedback_enabled':
+                        if (frontend_version_exploration.correctness_feedback_enabled == # pylint: disable=line-too-long
+                                backend_version_exploration.correctness_feedback_enabled): # pylint: disable=line-too-long
+                            change_is_mergeable = True
+                            exploration.update_correctness_feedback_enabled(
+                            change.new_value)
+
+                if change_is_mergeable:
+                    changes_are_mergeable = True
+                    continue
+                else:
+                    changes_are_mergeable = False
+                    return exploration
+
+            return exploration
+
+        except Exception as e:
+            logging.error(
+                '%s %s %s %s' % (
+                    e.__class__.__name__, e, exploration_id,
+                    pprint.pprint(change_list))
+            )
+            python_utils.reraise_exception()
+
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -1071,7 +1554,7 @@ def validate_exploration_for_story(exp, strict):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False, is_by_voice_artist=False):
+        is_suggestion=False, is_by_voice_artist=False, version=None):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1124,7 +1607,7 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    updated_exploration = apply_change_list(exploration_id, change_list)
+    updated_exploration = apply_change_list(exploration_id, change_list, version)
     if get_story_id_linked_to_exploration(exploration_id) is not None:
         validate_exploration_for_story(updated_exploration, True)
     _save_exploration(
@@ -1962,17 +2445,20 @@ def are_changes_mergeable(exp_id, frontend_version, change_list):
                                     'answer_group' not in
                                     changed_properties[old_state_name]):
                                 old_solution = (
-                                    frontend_version_exploration.states[old_state_name].interaction.solution) # pylint: disable=line-too-long
-                                new_solution = (
+                                        frontend_version_exploration.states[old_state_name].interaction.solution) # pylint: disable=line-too-long
+                                latest_solution = (
                                     backend_version_exploration.states[new_state_name].interaction.solution) # pylint: disable=line-too-long
-                                if old_solution and new_solution:
+                                if (old_solution and latest_solution):
                                     if (old_solution.answer_is_exclusive ==
-                                            new_solution.answer_is_exclusive and
+                                            latest_solution.answer_is_exclusive and
                                             old_solution.correct_answer ==
-                                            new_solution.correct_answer and
+                                            latest_solution.correct_answer and
                                             old_solution.explanation.html ==
-                                            new_solution.explanation.html):
+                                            latest_solution.explanation.html):
                                         change_is_mergeable = True
+                                if old_solution is None and latest_solution is None:
+                                    change_is_mergeable = True
+
                     else:
                         change_is_mergeable = True
                 elif (change.property_name ==
@@ -2174,7 +2660,7 @@ def create_or_update_draft(
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
-    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration = apply_change_list(exp_id, change_list, exp_version)
     updated_exploration.validate(strict=False)
 
     if exp_user_data is None:
@@ -2230,7 +2716,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
 
     if (exp_user_data and exp_user_data.draft_change_list and
             is_version_of_draft_valid(exp_id, draft_change_list_exp_version)):
-        updated_exploration = apply_change_list(exp_id, draft_change_list)
+        updated_exploration = apply_change_list(exp_id, draft_change_list, draft_change_list_exp_version)
         updated_exploration_has_no_invalid_math_tags = True
         # verify that all the math-tags are valid before returning the
         # updated exploration.
