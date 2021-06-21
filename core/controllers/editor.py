@@ -149,11 +149,12 @@ class ExplorationHandler(EditorHandler):
         try:
             if can_edit and are_changes_mergeable:
                 exp_services.update_exploration(
-                    self.user_id, exploration_id, change_list, commit_message)
+                    self.user_id, exploration_id, change_list,
+                    commit_message, version=version)
             elif can_voiceover and are_changes_mergeable:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message,
-                    is_by_voice_artist=True)
+                    is_by_voice_artist=True, version=version)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

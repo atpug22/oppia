@@ -663,6 +663,8 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     if (state_names_of_renamed_states[new_state_name] not in
                             old_to_new_state_names):
                         change_is_mergeable = True
+                        exploration.rename_state(
+                        change.old_state_name, change.new_state_name)
                 elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                     old_state_name = change.state_name
                     new_state_name = change.state_name
@@ -677,11 +679,11 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     if change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                         if (frontend_version_exploration.states[old_state_name].content.html == # pylint: disable=line-too-long
                                 backend_version_exploration.states[new_state_name].content.html): # pylint: disable=line-too-long
+                            change_is_mergeable = True
                             content = (
                                 state_domain.SubtitledHtml.from_dict(change.new_value))
                             content.validate()
                             state.update_content(content)
-                            change_is_mergeable = True
                     elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ID):
                         if old_state_name in changed_properties:
@@ -694,9 +696,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                         'solution' not in
                                         changed_properties[old_state_name]):
                                     change_is_mergeable = True
-                                    state.update_interaction_id(change.new_value)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             state.update_interaction_id(change.new_value)
                     # Customization args differ for every interaction, so in case of
                     # different interactions merging is simply not possible,
@@ -723,10 +725,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                         'solution' not in
                                         changed_properties[old_state_name]):
                                     change_is_mergeable = True
-                                    state.update_interaction_customization_args(
-                                        change.new_value)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             state.update_interaction_customization_args(
                                 change.new_value)
                     elif (change.property_name ==
@@ -741,13 +742,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                         'solution' not in
                                         changed_properties[old_state_name]):
                                     change_is_mergeable = True
-                                    new_answer_groups = [
-                                        state_domain.AnswerGroup.from_dict(answer_groups)
-                                        for answer_groups in change.new_value
-                                    ]
-                                    state.update_interaction_answer_groups(new_answer_groups)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             new_answer_groups = [
                                 state_domain.AnswerGroup.from_dict(answer_groups)
                                 for answer_groups in change.new_value
@@ -759,14 +756,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             if (change.property_name not in
                                     changed_properties[old_state_name]):
                                 change_is_mergeable = True
-                                new_outcome = None
-                                if change.new_value:
-                                    new_outcome = state_domain.Outcome.from_dict(
-                                        change.new_value
-                                    )
-                                state.update_interaction_default_outcome(new_outcome)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             new_outcome = None
                             if change.new_value:
                                 new_outcome = state_domain.Outcome.from_dict(
@@ -789,17 +781,10 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                             if (change.property_name not in
                                     changed_properties[old_state_name]):
                                 change_is_mergeable = True
-                                if not isinstance(change.new_value, list):
-                                    raise Exception(
-                                        'Expected hints_list to be a list,'
-                                        ' received %s' % change.new_value)
-                                new_hints_list = [
-                                    state_domain.Hint.from_dict(hint_dict)
-                                    for hint_dict in change.new_value
-                                ]
-                                state.update_interaction_hints(new_hints_list)
                         else:
                             change_is_mergeable = True
+
+                        if change_is_mergeable:
                             if not isinstance(change.new_value, list):
                                 raise Exception(
                                     'Expected hints_list to be a list,'
@@ -835,7 +820,7 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                                 new_solution = state_domain.Solution.from_dict(
                                                     state.interaction.id, change.new_value)
                                             state.update_interaction_solution(new_solution)
-                                    if old_solution is None and latest_solution is None:
+                                    elif old_solution is None and latest_solution is None:
                                         change_is_mergeable = True
                                         new_solution = None
                                         if change.new_value is not None:
@@ -858,13 +843,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                     frontend_version_exploration.states[old_state_name].solicit_answer_details == # pylint: disable=line-too-long
                                     backend_version_exploration.states[new_state_name].solicit_answer_details): # pylint: disable=line-too-long
                                 change_is_mergeable = True
-                                if not isinstance(change.new_value, bool):
-                                    raise Exception(
-                                        'Expected solicit_answer_details to be a ' +
-                                        'bool, received %s' % change.new_value)
-                                state.update_solicit_answer_details(change.new_value)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             if not isinstance(change.new_value, bool):
                                 raise Exception(
                                     'Expected solicit_answer_details to be a ' +
@@ -881,32 +862,10 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                                     'customization_args',
                                                     'recorded_voiceovers']):
                                 change_is_mergeable = True
-                                if not isinstance(change.new_value, dict):
-                                    raise Exception(
-                                        'Expected recorded_voiceovers to be a dict, '
-                                        'received %s' % change.new_value)
-                                # Explicitly convert the duration_secs value from
-                                # int to float. Reason for this is the data from
-                                # the frontend will be able to match the backend
-                                # state model for Voiceover properly. Also js
-                                # treats any number that can be float and int as
-                                # int (no explicit types). For example,
-                                # 10.000 is not 10.000 it is 10.
-                                new_voiceovers_mapping = (
-                                    change.new_value['voiceovers_mapping'])
-                                language_codes_to_audio_metadata = (
-                                    new_voiceovers_mapping.values())
-                                for language_codes in language_codes_to_audio_metadata:
-                                    for audio_metadata in language_codes.values():
-                                        audio_metadata['duration_secs'] = (
-                                            float(audio_metadata['duration_secs'])
-                                        )
-                                recorded_voiceovers = (
-                                    state_domain.RecordedVoiceovers.from_dict(
-                                        change.new_value))
-                                state.update_recorded_voiceovers(recorded_voiceovers)
                         else:
                             change_is_mergeable = True
+
+                        if change_is_mergeable:
                             if not isinstance(change.new_value, dict):
                                 raise Exception(
                                     'Expected recorded_voiceovers to be a dict, '
@@ -943,20 +902,9 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                                                     'default_outcome',
                                                     'customization_args']):
                                 change_is_mergeable = True
-                                if not isinstance(change.new_value, dict):
-                                    raise Exception(
-                                        'Expected written_translations to be a dict, '
-                                        'received %s' % change.new_value)
-                                cleaned_written_translations_dict = (
-                                    state_domain.WrittenTranslations
-                                    .convert_html_in_written_translations(
-                                        change.new_value, html_cleaner.clean))
-                                written_translations = (
-                                    state_domain.WrittenTranslations.from_dict(
-                                        cleaned_written_translations_dict))
-                                state.update_written_translations(written_translations)
                         else:
                             change_is_mergeable = True
+                        if change_is_mergeable:
                             if not isinstance(change.new_value, dict):
                                 raise Exception(
                                     'Expected written_translations to be a dict, '
@@ -1028,7 +976,12 @@ def apply_change_list(exploration_id, change_list, frontend_version):
                     continue
                 else:
                     changes_are_mergeable = False
-                    return exploration
+                    logging.error(
+                        '%s %s %s %s' % (
+                            Exception.__class__.__name__, Exception, exploration_id,
+                            pprint.pprint(change_list))
+                    )
+                    python_utils.reraise_exception()
 
             return exploration
 
