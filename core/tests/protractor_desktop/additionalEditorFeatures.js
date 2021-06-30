@@ -47,7 +47,7 @@ describe('Full exploration editor', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next',
+  fit('should walk through the tutorial when user repeatedly clicks Next',
     async function() {
       await users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
@@ -60,7 +60,7 @@ describe('Full exploration editor', function() {
     }
   );
 
-  it('should generate warning message if card height limit is exceeded',
+  fit('should generate warning message if card height limit is exceeded',
     async function() {
       await users.createUser('user@heightWarning.com', 'userHeightWarning');
       await users.login('user@heightWarning.com');
@@ -108,7 +108,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should handle discarding changes, navigation, deleting states, ' +
+  fit('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', async function() {
     await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
@@ -360,7 +360,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should delete interactions cleanly', async function() {
+  fit('should delete interactions cleanly', async function() {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
 
@@ -383,7 +383,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  it('should open a lost changes modal', async function() {
+  fit('should open a lost changes modal', async function() {
     await users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
     await users.createUser(
       'user10@editorAndPlayer.com',
