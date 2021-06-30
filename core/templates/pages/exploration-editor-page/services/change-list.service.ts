@@ -100,12 +100,12 @@ export class ChangeListService implements OnInit {
     // If error is present -> Check for the type of error occurred
     // (Display the corresponding modals in both cases, if not already
     // opened):
-    // - Version Mismatch.
+    // - Changes are not mergeable in version mismatch.
     // - Non-strict Validation Fail.
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList,
       response => {
-        if (!response.is_version_of_draft_valid) {
+        if (!response.are_changes_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
               explorationChangeList);

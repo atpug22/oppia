@@ -16,12 +16,13 @@
  * @fileoverview Component for lost changes modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import { LoggerService } from 'services/contextual/logger.service';
 import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-lost-changes-modal',
@@ -33,6 +34,8 @@ export class LostChangesModalComponent
   hasLostChanges: boolean;
 
   constructor(
+    private elRef: ElementRef,
+    private windowRef: WindowRef,
     private loggerService: LoggerService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
     private ngbActiveModal: NgbActiveModal,
@@ -49,6 +52,18 @@ export class LostChangesModalComponent
   }
 
   cancel(): void {
+    this.ngbActiveModal.dismiss();
+  }
+
+  exportChangesAndClose(): void {
+    let lostChangesData: HTMLElement = (
+      this.elRef.nativeElement.getElementsByClassName(
+        'oppia-lost-changes'));
+    let blob = new Blob([lostChangesData[0].innerText], {type: 'text/plain'});
+    var elem = this.windowRef.nativeWindow.document.createElement('a');
+    elem.href = URL.createObjectURL(blob);
+    elem.download = 'lostChanges.txt';
+    elem.click();
     this.ngbActiveModal.dismiss();
   }
 }

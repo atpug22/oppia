@@ -194,7 +194,36 @@ describe('Save Version Mismatch Modal Component', () => {
     fixture.detectChanges();
 
     expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to copy and ' +
-      'paste these changes before discarding them.');
+      'The lost changes are displayed below. You may want to export or ' +
+      'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    const reloadSpy = jasmine.createSpy('reload');
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        reload: reloadSpy
+      }
+    });
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.hasLostChanges = true;
+    component.exportAndDiscardChanges();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    waitForAsync(() => {
+      expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
   });
 });

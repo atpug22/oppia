@@ -25,7 +25,6 @@ import { LostChange, LostChangeObjectFactory } from
 
 import { LostChangesModalComponent } from './lost-changes-modal.component';
 import { LoggerService } from 'services/contextual/logger.service';
-
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   template: ''
@@ -88,7 +87,6 @@ describe('Lost Changes Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     loggerService = TestBed.inject(LoggerService);
     logSpy = spyOn(loggerService, 'error').and.callThrough();
-
     fixture.detectChanges();
   });
 
@@ -135,7 +133,27 @@ describe('Lost Changes Modal Component', () => {
     fixture.detectChanges();
 
     expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to copy and ' +
-      'paste these changes before discarding them.');
+      'The lost changes are displayed below. You may want to export or ' +
+      'copy and paste these changes before discarding them.');
+  });
+
+  it('should export the lost changes and close the modal', () => {
+    spyOn(
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
+    ).withArgs('oppia-lost-changes').and.returnValue([
+      {
+        innerText: 'Dummy Inner Text'
+      }
+    ]);
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    const spyObj = jasmine.createSpyObj('a', ['click']);
+    spyOn(document, 'createElement').and.returnValue(spyObj);
+    component.exportChangesAndClose();
+    expect(document.createElement).toHaveBeenCalledTimes(1);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(spyObj.download).toBe('lostChanges.txt');
+    expect(spyObj.click).toHaveBeenCalledTimes(1);
+    expect(spyObj.click).toHaveBeenCalledWith();
+    expect(dismissSpy).toHaveBeenCalledWith();
   });
 });
