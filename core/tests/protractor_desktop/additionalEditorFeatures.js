@@ -383,7 +383,7 @@ describe('Full exploration editor', function() {
     await users.logout();
   });
 
-  fit('should open a lost changes modal', async function() {
+  it('should open a lost changes modal', async function() {
     await users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
     await users.createUser(
       'user10@editorAndPlayer.com',
