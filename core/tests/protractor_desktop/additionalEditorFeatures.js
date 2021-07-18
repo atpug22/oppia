@@ -549,7 +549,7 @@ describe('Full exploration editor', function() {
       await general.openEditor(explorationId, false);
       await waitFor.visibilityOf(
         lostChangesModal, 'Lost Changes Modal taking too long to appear');
-      await explorationEditorPage.discardLostChanges();
+      await explorationEditorPage.discardAndExportLostChanges();
       await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
