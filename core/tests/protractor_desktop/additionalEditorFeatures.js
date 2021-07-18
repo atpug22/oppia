@@ -549,6 +549,7 @@ describe('Full exploration editor', function() {
       await waitFor.visibilityOf(
         lostChangesModal, 'Lost Changes Modal taking too long to appear');
       await explorationEditorPage.discardLostChanges();
+      await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.expectContentToMatch(
         async function(richTextChecker) {
           await richTextChecker.readPlainText('You must be feeling great?');
